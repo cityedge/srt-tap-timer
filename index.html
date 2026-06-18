@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>SRT Tap Timer v1.27</title>
+<title>SRT Tap Timer v1.28</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
@@ -481,7 +481,7 @@
 <body tabindex="-1">
 <header>
   <div class="headerMain">
-    <h1>SRT Tap Timer v1.27</h1>
+    <h1>SRT Tap Timer v1.28</h1>
     <div class="sub" data-i18n="app.subtitle">
       メタタグ付き歌詞テキストから歌詞行だけを抽出し、音源を聴きながらキーボードでSRTタイミングを打ち直すローカルツールです。
     </div>
@@ -1630,14 +1630,94 @@
     return blocks.join("\n");
   }
 
+  function getLastEndOnlyMissingCase(problems) {
+    if (!lines.length) return null;
+    if (problems.missingStart !== 0 || problems.missingEnd !== 1 || problems.invalidRange !== 0) return null;
+
+    const lastIndex = lines.length - 1;
+    const last = lines[lastIndex];
+    if (!last || last.start == null || last.end != null) return null;
+
+    for (let i = 0; i < lastIndex; i++) {
+      const line = lines[i];
+      if (!line || line.start == null || line.end == null || line.end <= line.start) return null;
+    }
+
+    return { index: lastIndex, line: last };
+  }
+
+  function getAutoLastEndCandidate(lastLine) {
+    if (!lastLine || lastLine.start == null) return null;
+    const tenSecondsLater = lastLine.start + 10;
+    let candidate = tenSecondsLater;
+    let usedDuration = false;
+
+    if (audio && Number.isFinite(audio.duration) && audio.duration > lastLine.start) {
+      candidate = Math.min(tenSecondsLater, audio.duration);
+      usedDuration = candidate === audio.duration;
+    }
+
+    if (!Number.isFinite(candidate) || candidate <= lastLine.start) return null;
+    return { time: candidate, usedDuration };
+  }
+
+  function askAutoFillLastEnd(candidateInfo, lastLine) {
+    if (!candidateInfo) return "cancel";
+    const candidateText = formatSrtTime(candidateInfo.time);
+    const startText = formatSrtTime(lastLine.start);
+    const sourceTextJa = candidateInfo.usedDuration
+      ? "音源の終了時刻"
+      : "最後の字幕の開始時刻から10秒後";
+    const sourceTextEn = candidateInfo.usedDuration
+      ? "the media end time"
+      : "10 seconds after the last subtitle start";
+
+    const msg = currentLang === "ja"
+      ? `最後の字幕の終了時刻だけが未設定です。\n\n最後の字幕の開始時刻: ${startText}\n自動設定候補: ${candidateText}\n候補の根拠: 最後の字幕の開始時刻から10秒後、または音源終了時刻の早い方（今回は ${sourceTextJa}）\n\n1: 候補時刻を設定して保存\n2: 未設定のまま途中保存\nキャンセルまたは空欄: 保存をキャンセル\n\n入力してください: 1 または 2`
+      : `Only the last subtitle is missing an end time.\n\nLast subtitle start: ${startText}\nAuto-fill candidate: ${candidateText}\nCandidate rule: earlier of 10 seconds after the last subtitle start and the media end time (this time: ${sourceTextEn})\n\n1: Set the candidate end time and save\n2: Save as a draft with the end time still missing\nCancel or blank: cancel export\n\nEnter 1 or 2:`;
+
+    const answer = prompt(msg, "1");
+    if (answer == null) return "cancel";
+    const normalized = String(answer).trim();
+    if (normalized === "1") return "autofill";
+    if (normalized === "2") return "draft";
+    return "cancel";
+  }
+
   function exportSrt() {
     if (!lines.length) {
       log(currentLang === "ja" ? "書き出す字幕行がありません。" : "There are no subtitle rows to export.");
       return;
     }
 
-    const problems = getExportProblemCounts();
-    if (problems.total > 0) {
+    let problems = getExportProblemCounts();
+    let skipProblemConfirm = false;
+
+    const lastEndOnlyMissing = getLastEndOnlyMissingCase(problems);
+    if (lastEndOnlyMissing) {
+      const candidateInfo = getAutoLastEndCandidate(lastEndOnlyMissing.line);
+      const choice = askAutoFillLastEnd(candidateInfo, lastEndOnlyMissing.line);
+
+      if (choice === "autofill") {
+        pushUndo();
+        lines[lastEndOnlyMissing.index].end = candidateInfo.time;
+        activeIndex = null;
+        render();
+        problems = getExportProblemCounts();
+        log(currentLang === "ja"
+          ? `最後の字幕の終了時刻を ${formatSrtTime(candidateInfo.time)} に自動設定しました。`
+          : `Auto-filled the last subtitle end time as ${formatSrtTime(candidateInfo.time)}.`
+        );
+      } else if (choice === "draft") {
+        skipProblemConfirm = true;
+      } else {
+        log(currentLang === "ja" ? "SRT保存をキャンセルしました。" : "SRT export was canceled.");
+        focusApp();
+        return;
+      }
+    }
+
+    if (problems.total > 0 && !skipProblemConfirm) {
       const msg = currentLang === "ja"
         ? `未完成または不正なタイムスタンプがあります。\n\n開始未設定: ${problems.missingStart}行\n終了未設定: ${problems.missingEnd}行\n終了が開始以下: ${problems.invalidRange}行\n\n未設定時刻は --:--,--- として保存します。\n通常の字幕プレイヤーでは正しく読めない可能性がありますが、このツールでは途中保存用として再読み込みできます。\n\nこのまま保存しますか？`
         : `Some timestamps are incomplete or invalid.\n\nMissing start: ${problems.missingStart} row(s)\nMissing end: ${problems.missingEnd} row(s)\nEnd time not later than start: ${problems.invalidRange} row(s)\n\nMissing times will be saved as --:--,---.\nThe file may not work in normal subtitle players, but this tool can reload it as a draft.\n\nSave anyway?`;
