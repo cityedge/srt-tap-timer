@@ -1,47 +1,58 @@
-# SRT Tap Timer
+# SRT Tap Timer v1.55
 
-SRT Tap Timer is a browser-based SRT subtitle timing editor for lyric subtitles.
+SRT Tap Timer is a local, single-file HTML tool for creating and editing SRT subtitles while listening to audio. It is designed primarily for Japanese song subtitles, especially Suno-style music production workflows where timing must be adjusted by ear.
 
-音源を再生しながら、キーボード操作で歌詞字幕の開始・終了タイミングを作成・修正するためのHTML単体アプリです。音源・歌詞・SRTファイルはブラウザ内でローカルに処理され、サーバーへアップロードされません。
-
-## Use the app
-
-Open `index.html` on GitHub Pages, or download the standalone package from Releases and open the HTML file locally.
-
-## Documentation
-
-- [Full User Guide / フル操作マニュアル](USER_GUIDE.md)
-- [Changelog / 更新履歴](CHANGELOG.md)
-- [License](LICENSE)
-
-## Current version
-
-v1.44
+The app runs in the browser. It does not require a server, and the subtitle/audio/image files are processed locally in the browser.
 
 ## Main features
 
-- Create SRT timing from plain lyric text.
-- Re-time existing SRT files.
-- Tap subtitle start timing with `R`.
-- Set end timing with `E`.
-- Keep upcoming lyric rows visible with comfortable auto-scroll during real-time R/E tap input.
-- Support both beginner mode and advanced mode.
-- Show a local waveform around the current playback position.
-- Apply a tap input offset to `R` / `E` timing.
-- Auto-detect UTF-8 / Shift-JIS text encoding when loading lyric or SRT files.
-- Adjust waveform display timing independently from tap input timing.
-- Edit the selected row directly from the left-pane inspector.
-- Optionally remove ASCII parenthetical metadata lines such as `(Fade out)` during lyric extraction.
-- Save incomplete draft SRT files using `--:--,---`.
-- Reload draft SRT files and continue editing.
-- Preview completed subtitles in a modal preview screen.
+- Extract lyric lines from a metatagged lyrics text file, or load an existing SRT draft.
+- Tap subtitle timing while listening to audio.
+- Use `R` to set the current row start time and move forward.
+- Use `E` to set an end time.
+- Use `Space` to play/pause audio.
+- Use `Z` to undo timing and edit operations.
+- Edit selected row start/end/text directly.
+- Add, delete, clear, select, and bulk-shift subtitle rows.
+- Display a nearby waveform around the current playback position.
+- Export an SRT file.
+- Preview subtitles in the integrated video-export window.
+- Create a still-image + audio + subtitle WebM video in the browser.
+- Create either horizontal 16:9 video or vertical 9:16 short video.
+- Adjust subtitle height, font size, outline, black band, and image fitting.
+- Japanese / English UI switching.
 
-## Privacy
+## Included files
 
-This tool runs entirely in the browser. Audio, lyrics, and SRT files are read locally by the browser. The app does not upload these files to any server.
+- `index.html` — SRT Tap Timer v1.55 application.
+- `README.md` — this overview.
+- `USER_GUIDE.md` — detailed usage guide in Japanese.
+- `CHANGELOG.md` — version history.
+- `LICENSE` — MIT License.
+- `convert_webm_to_mp4.bat` — Windows helper script to convert exported WebM files to MP4 with ffmpeg.
+- `convert_mp3_to_wav.bat` — Windows helper script to convert MP3 files to WAV with ffmpeg.
+
+## Target environment
+
+The primary target is Windows + Chrome / Edge.
+
+The integrated video export uses browser APIs such as Canvas, Web Audio, `captureStream()`, and `MediaRecorder`. Chrome / Edge on desktop is the recommended environment. Mobile browsers and Safari are not primary targets.
+
+## Important recording note
+
+When creating a WebM video, keep the SRT Tap Timer tab in the foreground until recording finishes. If the tab is moved to the background during recording, the browser may throttle Canvas drawing and the created WebM may have audio and image but no subtitles.
+
+v1.55 shows a confirmation dialog before video creation to warn about this.
+
+## Helper BAT files
+
+The included BAT files assume that `ffmpeg` is installed and available in `PATH`.
+
+- Drop one or more WebM files onto `convert_webm_to_mp4.bat` to create MP4 files for platforms such as TikTok and Instagram.
+- Drop one or more MP3 files onto `convert_mp3_to_wav.bat` to create WAV files.
+
+The helper scripts do not overwrite existing output files. If an output file with the same name already exists, conversion stops with an error.
 
 ## License
 
-This project is licensed under the MIT License.
-
-Copyright (c) 2026 cityedge
+MIT License. See `LICENSE`.

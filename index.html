@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>SRT Tap Timer v1.44</title>
+<title>SRT Tap Timer v1.55</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
@@ -579,86 +579,9 @@
   .checkRow input {
     margin-top: 2px;
   }
-  .previewModal {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.72);
-    padding: 18px;
-  }
-  .previewModal.show { display: flex; }
-  .previewDialog {
-    width: min(940px, 96vw);
-    height: min(720px, 92vh);
-    max-height: 92vh;
-    background: #10131a;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    box-shadow: 0 14px 48px rgba(0, 0, 0, 0.55);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  .previewHeader {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--line);
-    background: #151922;
-  }
-  .previewHeader .title { font-weight: 650; }
   .previewCloseX {
     min-width: 34px;
     padding: 5px 10px;
-  }
-  .previewScreen {
-    position: relative;
-    flex: 1 1 auto;
-    min-height: 160px;
-    background: radial-gradient(circle at 50% 35%, rgba(60, 70, 90, 0.18), transparent 45%), #000;
-  }
-  .previewCaption {
-    position: absolute;
-    left: 8%;
-    right: 8%;
-    top: 50%;
-    transform: translateY(-50%);
-    text-align: center;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-    word-break: normal;
-    font-size: clamp(15px, 2.5vw, 28px);
-    line-height: 1.32;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,1);
-    padding: 7px 12px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.42);
-    max-height: 82%;
-    overflow: hidden;
-  }
-  .previewCaption.empty { background: transparent; }
-  .previewControls {
-    flex: 0 0 auto;
-    padding: 8px 12px 10px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-  }
-  .previewControls audio {
-    width: 100%;
-    margin: 0 0 7px;
-  }
-  .previewControls .row { margin-bottom: 0; }
-  .previewControls .help {
-    margin-top: 6px;
-    font-size: 11px;
-    line-height: 1.35;
   }
   @media (max-width: 980px) {
     body { overflow: auto; }
@@ -675,12 +598,263 @@
       max-height: 70vh;
     }
   }
+
+  /* Video preview placeholder subtitle removed. */
+  .sttvVideoExportModal {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.74);
+    padding: 18px;
+  }
+  .sttvVideoExportModal.show { display: flex; }
+  .sttvVideoExportDialog {
+    width: min(1180px, 97vw);
+    height: min(820px, 94vh);
+    max-height: 94vh;
+    background: #10131a;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 14px 48px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .sttvVideoExportHeader {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    background: #151922;
+  }
+  .sttvVideoExportHeader .title { font-weight: 650; }
+
+  .sttv-root {
+    --sttv-bg: #111318;
+    --sttv-panel: #1a1d25;
+    --sttv-panel-2: #222633;
+    --sttv-text: #f1f3f7;
+    --sttv-muted: #aab0bf;
+    --sttv-line: #34394a;
+    --sttv-accent: #7ab7ff;
+    --sttv-warn: #ffae66;
+    color: var(--sttv-text);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .sttv-root * { box-sizing: border-box; }
+  .sttv-root .sttv-shell {
+    display: grid;
+    grid-template-columns: minmax(280px, 340px) minmax(420px, 1fr);
+    gap: 12px;
+    padding: 12px;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .sttv-root .sttv-panel,
+  .sttv-root .sttv-compact-box,
+  .sttv-root .sttv-preview-wrap {
+    background: var(--sttv-panel);
+    border: 1px solid var(--sttv-line);
+    border-radius: 12px;
+    padding: 12px;
+    min-width: 0;
+  }
+  .sttv-root .sttv-panel,
+  .sttv-root .sttv-right-pane {
+    min-height: 0;
+    overflow: auto;
+  }
+  .sttv-root .sttv-section-title {
+    margin: 0 0 10px;
+    font-size: 15px;
+  }
+  .sttv-root .sttv-section-title.sttv-gap-top { margin-top: 16px; }
+  .sttv-root .sttv-field { margin-bottom: 11px; }
+  .sttv-root .sttv-label {
+    display: block;
+    font-size: 12px;
+    color: var(--sttv-muted);
+    margin: 0 0 5px;
+  }
+  .sttv-root input[type="file"],
+  .sttv-root select,
+  .sttv-root input[type="range"] {
+    width: 100%;
+    font: inherit;
+  }
+  .sttv-root input[type="file"],
+  .sttv-root select {
+    border: 1px solid var(--sttv-line);
+    border-radius: 7px;
+    background: var(--sttv-panel-2);
+    color: var(--sttv-text);
+    padding: 7px;
+  }
+  .sttv-root input[type="range"] { accent-color: var(--sttv-accent); }
+  .sttv-root .sttv-range-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+  }
+  .sttv-root .sttv-range-value {
+    min-width: 52px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--sttv-muted);
+    font-size: 12px;
+  }
+  .sttv-root .sttv-video-options-row {
+    display: grid;
+    grid-template-columns: auto minmax(130px, 180px);
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .sttv-root .sttv-image-fit-compact {
+    min-width: 0;
+  }
+  .sttv-root .sttv-mini-label-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+  }
+  .sttv-root .sttv-inline-label {
+    display: inline-block;
+    margin: 0;
+  }
+  .sttv-root .sttv-fit-value {
+    min-width: 42px;
+  }
+  .sttv-root .sttv-check {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    color: var(--sttv-muted);
+    font-size: 12px;
+    margin: 0;
+  }
+  .sttv-root .sttv-check input { margin-top: 2px; }
+  .sttv-root .sttv-short-check { align-items: center; white-space: nowrap; }
+  .sttv-root .sttv-hint {
+    color: var(--sttv-muted);
+    font-size: 11px;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .sttv-root .sttv-hint.sttv-tight { margin-top: -4px; margin-bottom: 10px; }
+  .sttv-root .sttv-status {
+    padding: 10px;
+    border: 1px solid var(--sttv-line);
+    border-radius: 10px;
+    background: #12151d;
+    font-size: 12px;
+    white-space: pre-wrap;
+  }
+  .sttv-root .sttv-toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    align-items: center;
+  }
+  .sttv-root .sttv-image-toolbar {
+    margin-top: 7px;
+  }
+  .sttv-root .sttv-button,
+  .sttv-root .sttv-download-link {
+    appearance: none;
+    border: 1px solid var(--sttv-line);
+    border-radius: 7px;
+    background: var(--sttv-panel-2);
+    color: var(--sttv-text);
+    padding: 7px 9px;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .sttv-root .sttv-button.sttv-primary { background: #203855; border-color: #356297; }
+  .sttv-root .sttv-button:hover,
+  .sttv-root .sttv-download-link:hover { border-color: var(--sttv-accent); }
+  .sttv-root .sttv-button:disabled { opacity: 0.45; cursor: default; }
+  .sttv-root .sttv-progress {
+    width: 100%;
+    height: 12px;
+    margin-top: 8px;
+  }
+  .sttv-root .sttv-right-pane {
+    display: grid;
+    grid-template-rows: minmax(0, auto) auto;
+    gap: 10px;
+    min-width: 0;
+  }
+  .sttv-root .sttv-preview-wrap {
+    background: #0e1016;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .sttv-root .sttv-preview-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+    color: var(--sttv-muted);
+    font-size: 12px;
+  }
+  .sttv-root .sttv-canvas-box {
+    min-height: 280px;
+    display: grid;
+    place-items: center;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .sttv-root .sttv-canvas {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 58vh;
+    background: #000;
+  }
+  .sttv-root .sttv-audio { width: 100%; }
+  .sttv-root .sttv-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .sttv-root .sttv-hidden { display: none !important; }
+  @media (max-width: 900px) {
+    .sttv-root .sttv-shell { grid-template-columns: 1fr; }
+    .sttv-root .sttv-canvas-box { min-height: 220px; }
+    .sttv-root .sttv-canvas { max-height: 44vh; }
+    .sttv-root .sttv-video-options-row { grid-template-columns: 1fr; }
+  }
+
 </style>
 </head>
 <body tabindex="-1">
 <header>
   <div class="headerMain">
-    <h1>SRT Tap Timer v1.44</h1>
+    <h1>SRT Tap Timer v1.55</h1>
     <div class="sub" data-i18n="app.subtitle">
       メタタグ付き歌詞テキストから歌詞行だけを抽出し、音源を聴きながらキーボードでSRTタイミングを打ち直すローカルツールです。
     </div>
@@ -828,6 +1002,7 @@
       <button id="exportBtn" class="primary" data-i18n="button.saveSrt">SRT保存</button>
     </div>
 
+
     <div id="log" class="log"></div>
   </section>
 
@@ -838,7 +1013,7 @@
     </div>
 
     <div class="toolbar">
-      <button id="previewBtn" data-i18n="button.preview">プレビュー</button>
+      <button id="previewBtn" data-i18n="button.previewVideoExport">プレビュー / 動画作成</button>
       <button id="insertRowAboveBtn" class="advancedOnly" data-i18n="button.insertRowAbove">上に行追加</button>
       <button id="insertRowBelowBtn" data-i18n="button.insertRowBelow">下に行追加</button>
       <button id="deleteCurrentRowBtn" class="danger" data-i18n="button.deleteCurrentRow">現在行を削除</button>
@@ -862,7 +1037,7 @@
           <input id="waveformOffsetMs" type="number" value="0" step="10" style="width:62px;">
         </span>
         <span class="monitorIntervalInline">
-          <span class="small" data-i18n="setting.monitorInterval">プレビュー・字幕位置更新周期</span>
+          <span class="small" data-i18n="setting.monitorInterval">字幕位置マーク更新周期</span>
           <input id="monitorIntervalMs" type="number" value="50" min="20" max="1000" step="10" style="width:62px;">
           <button id="applyMonitorIntervalBtn" data-i18n="button.apply">適用</button>
         </span>
@@ -888,23 +1063,98 @@
   </section>
 </main>
 
-<div id="previewModal" class="previewModal" aria-hidden="true">
-  <div class="previewDialog" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
-    <div class="previewHeader">
-      <div id="previewTitle" class="title" data-i18n="preview.title">字幕プレビュー</div>
-      <button id="previewCloseX" class="previewCloseX" data-i18n="preview.close">閉じる</button>
+<div id="sttvVideoExportModal" class="sttvVideoExportModal" aria-hidden="true">
+  <div class="sttvVideoExportDialog" role="dialog" aria-modal="true" aria-labelledby="sttvVideoExportTitle">
+    <div class="sttvVideoExportHeader">
+      <div id="sttvVideoExportTitle" class="title" data-i18n="sttv.title">プレビュー / 簡易字幕付き動画作成</div>
+      <button id="sttvVideoExportCloseX" class="previewCloseX" data-i18n="preview.close">閉じる</button>
     </div>
-    <div class="previewScreen">
-      <div id="previewCaption" class="previewCaption empty"></div>
-    </div>
-    <div class="previewControls">
-      <audio id="previewAudio" controls></audio>
-      <div class="row">
-        <button id="previewRestartBtn" data-i18n="preview.restart">開始位置から再生</button>
-        <button id="previewCloseBtn" data-i18n="preview.close">閉じる</button>
-      </div>
-      <div class="help" data-i18n-html="preview.hint">
-        開始・終了の両方があり、終了が開始より後の字幕だけを表示します。閉じると、編集用の音源位置はプレビュー開始前に戻ります。
+    <div id="sttvRoot" class="sttv-root">
+      <div class="sttv-shell">
+        <section class="sttv-panel">
+          <h2 class="sttv-section-title" data-i18n="sttv.section.image">1. 画像</h2>
+          <div class="sttv-field">
+            <label class="sttv-label" for="sttvImageFile" data-i18n="sttv.imageFile">画像ファイル</label>
+            <input id="sttvImageFile" type="file" accept="image/*" />
+            <div class="sttv-toolbar sttv-image-toolbar">
+              <button id="sttvClearImageButton" class="sttv-button" type="button" disabled data-i18n="sttv.clearImage">画像をクリア</button>
+            </div>
+          </div>
+          <div id="sttvFileStatus" class="sttv-status"></div>
+
+          <h2 class="sttv-section-title sttv-gap-top" data-i18n="sttv.section.settings">2. 設定</h2>
+          <div class="sttv-field">
+            <div class="sttv-video-options-row">
+              <label class="sttv-check sttv-short-check"><input id="sttvShortVideo" type="checkbox" /> <span data-i18n="sttv.shortVideo">ショート動画</span></label>
+              <div class="sttv-image-fit-compact">
+                <div class="sttv-mini-label-row">
+                  <span class="sttv-label sttv-inline-label" data-i18n="sttv.imageFit">画像合わせ</span>
+                  <span id="sttvImageFitValue" class="sttv-range-value sttv-fit-value">x1.00</span>
+                </div>
+                <input id="sttvImageFit" type="range" min="0" max="100" value="0" step="1" />
+              </div>
+            </div>
+            <div class="sttv-hint" data-i18n="sttv.videoOptionsHint">チェックOFF時は横長（16:9 / 1280×720）、ON時は縦長（9:16 / 720×1280）で出力します。画像合わせは左端が全体表示、右にいくほど拡大します。</div>
+          </div>
+
+          <div class="sttv-field">
+            <label class="sttv-label" for="sttvSubtitleY" data-i18n="sttv.subtitleY">字幕の高さ</label>
+            <div class="sttv-range-row">
+              <input id="sttvSubtitleY" type="range" min="4" max="96" value="84" />
+              <div id="sttvSubtitleYValue" class="sttv-range-value">84%</div>
+            </div>
+          </div>
+          <div class="sttv-field">
+            <label class="sttv-label" for="sttvFontSize" data-i18n="sttv.fontSize">文字サイズ</label>
+            <div class="sttv-range-row">
+              <input id="sttvFontSize" type="range" min="24" max="72" value="45" />
+              <div id="sttvFontSizeValue" class="sttv-range-value">45</div>
+            </div>
+          </div>
+          <div class="sttv-two-col">
+            <div class="sttv-field">
+              <label class="sttv-check"><input id="sttvUseOutline" type="checkbox" checked /> <span data-i18n="sttv.useOutline">文字に縁取り</span></label>
+            </div>
+            <div class="sttv-field">
+              <label class="sttv-check"><input id="sttvUseBand" type="checkbox" /> <span data-i18n="sttv.useBand">背景に黒帯</span></label>
+            </div>
+          </div>
+          <div class="sttv-hint sttv-tight" data-i18n="sttv.subtitleHint">字幕の横幅は90%固定です。長い字幕は自動改行されます。</div>
+          <div class="sttv-toolbar">
+            <button id="sttvResetButton" class="sttv-button" type="button" data-i18n="sttv.resetSettings">設定を初期値に戻す</button>
+          </div>
+
+          <h2 class="sttv-section-title sttv-gap-top" data-i18n="sttv.section.create">3. 作成</h2>
+          <div class="sttv-compact-box sttv-record-box">
+            <div id="sttvRecordStatus" class="sttv-status"></div>
+            <progress id="sttvProgressBar" class="sttv-progress" max="1" value="0"></progress>
+            <div class="sttv-toolbar">
+              <button id="sttvRecordButton" class="sttv-button sttv-primary" type="button" disabled data-i18n="sttv.button.createVideo">動画作成</button>
+              <button id="sttvCancelButton" class="sttv-button" type="button" disabled data-i18n="sttv.button.cancel">中止</button>
+              <a id="sttvDownloadLink" class="sttv-download-link sttv-hidden" download>保存</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="sttv-right-pane">
+          <div class="sttv-preview-wrap">
+            <div class="sttv-preview-head">
+              <strong data-i18n="sttv.videoPreview">動画プレビュー</strong>
+              <span id="sttvVideoInfo">1280×720 / WebM</span>
+            </div>
+            <div class="sttv-canvas-box">
+              <canvas id="sttvPreviewCanvas" class="sttv-canvas" width="1280" height="720"></canvas>
+            </div>
+          </div>
+
+          <div class="sttv-compact-box">
+            <label class="sttv-label" for="sttvPreviewAudio" data-i18n="sttv.audioSubtitlePreview">音源・字幕プレビュー</label>
+            <audio id="sttvPreviewAudio" class="sttv-audio" controls></audio>
+            <div class="sttv-hint" data-i18n="sttv.previewHint">このプレビューは動画作成機能専用です。録画開始時には自動停止します。</div>
+          </div>
+
+
+        </section>
       </div>
     </div>
   </div>
@@ -957,15 +1207,61 @@
       "setting.tapOffset": "タップ入力オフセット",
       "setting.waveformOffset": "波形表示オフセット",
       "help.shortcuts": "<span class=\"kbd\">Space</span> 再生/停止　<span class=\"kbd\">R</span> 開始ON・次行へ　<span class=\"kbd\">E</span> 終了OFF（設定によりE対象を切替）<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> 字幕行移動　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> 音源を2秒移動　<span class=\"kbd\">Z</span> 直前操作をアンドゥ<br><span class=\"kbd\">Ins</span> 下に行追加　<span class=\"kbd\">Shift+Ins</span> 上に行追加　<span class=\"kbd\">Del</span> 現在行削除　<span class=\"kbd\">Backspace</span> 時刻消去<br>途中保存では、未設定時刻も <span class=\"kbd\">--:--,---</span> として保存します。<br>右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。",
-      "setting.monitorInterval": "プレビュー・字幕位置更新周期",
+      "setting.monitorInterval": "字幕位置マーク更新周期",
       "button.apply": "適用",
       "label.outputFile": "SRT出力ファイル名",
       "button.preview": "プレビュー",
+      "button.previewVideoExport": "プレビュー / 動画作成",
+      "sttv.title": "プレビュー / 簡易字幕付き動画作成",
+      "sttv.section.image": "1. 画像",
+      "sttv.imageFile": "画像ファイル",
+      "sttv.clearImage": "画像をクリア",
+      "sttv.section.settings": "2. 設定",
+      "sttv.shortVideo": "ショート動画",
+      "sttv.imageFit": "画像合わせ",
+      "sttv.videoOptionsHint": "チェックOFF時は横長（16:9 / 1280×720）、ON時は縦長（9:16 / 720×1280）で出力します。画像合わせは左端が全体表示、右にいくほど拡大します。",
+      "sttv.subtitleY": "字幕の高さ",
+      "sttv.fontSize": "文字サイズ",
+      "sttv.useOutline": "文字に縁取り",
+      "sttv.useBand": "背景に黒帯",
+      "sttv.subtitleHint": "字幕の横幅は90%固定です。長い字幕は自動改行されます。",
+      "sttv.resetSettings": "設定を初期値に戻す",
+      "sttv.section.create": "3. 作成",
+      "sttv.button.createVideo": "動画作成",
+      "sttv.button.cancel": "中止",
+      "sttv.button.save": "保存",
+      "sttv.videoPreview": "動画プレビュー",
+      "sttv.audioSubtitlePreview": "音源・字幕プレビュー",
+      "sttv.previewHint": "このプレビューは動画作成機能専用です。録画開始時には自動停止します。",
+      "sttv.status.image": "画像",
+      "sttv.status.audio": "音源",
+      "sttv.status.subtitles": "字幕",
+      "sttv.status.notLoaded": "未読み込み",
+      "sttv.status.audioNotLoaded": "未読み込み（本体で音源を読み込んでください）",
+      "sttv.status.subtitleNotReady": "未確定（開始・終了がある行がありません）",
+      "sttv.status.lines": "行",
+      "sttv.record.ready": "録画準備待ちです。",
+      "sttv.record.done": "作成完了。WebM形式で保存できます。",
+      "sttv.record.cancelled": "中止しました。",
+      "sttv.record.noData": "録画データが作成されませんでした。",
+      "sttv.record.emptyData": "録画データが空でした。",
+      "sttv.record.starting": "録画を開始します。音源の長さぶん待ってください。このタブを前面に表示したままにしてください。",
+      "sttv.record.recording": "録画中",
+      "sttv.record.keepFront": "このタブを前面に表示したままにしてください。",
+      "sttv.record.confirmStart": "録画中にブラウザのタブを切り替えると、WebMは作成されても字幕が入らないことがあります。\n録画が終わるまで、このタブを前面に表示したままにしてください。\n\n動画作成を開始しますか？",
+      "sttv.record.cancelBeforeStart": "動画作成をキャンセルしました。",
+      "sttv.error.materialsMissing": "画像・音源・字幕がそろっていません。画像を選択し、本体側で音源と完成字幕行を用意してください。",
+      "sttv.error.browserUnsupported": "このブラウザは録画機能に対応していません。Chrome または Edge で試してください。",
+      "sttv.error.imageLoad": "画像を読み込めませんでした。",
+      "sttv.error.clearImageRecording": "録画中は画像をクリアできません。",
+      "sttv.error.duration": "音源の長さを取得できませんでした。",
+      "sttv.error.audioCapture": "このブラウザでは音声ストリームの録画に対応していません。ChromeまたはEdgeで試してください。",
+      "sttv.error.recorder": "このブラウザではWebM録画を開始できませんでした。",
+      "sttv.error.recording": "録画中にエラーが発生しました。",
+      "sttv.error.generic": "エラー",
+      "sttv.canvas.noImage": "画像プレビュー",
       "button.saveSrt": "SRT保存",
-      "preview.title": "字幕プレビュー",
       "preview.close": "閉じる",
-      "preview.restart": "開始位置から再生",
-      "preview.hint": "開始・終了の両方があり、終了が開始より後の字幕だけを中央表示します。プレビュー更新周期は表示中字幕マーク更新周期と同じです。閉じると、編集用の音源位置はプレビュー開始前に戻ります。",
       "section.selectedEditor": "選択行の編集",
       "label.editStart": "開始",
       "label.editEnd": "終了",
@@ -1033,15 +1329,61 @@
       "setting.tapOffset": "Tap input offset",
       "setting.waveformOffset": "Waveform display offset",
       "help.shortcuts": "<span class=\"kbd\">Space</span> Play/Pause　<span class=\"kbd\">R</span> Set start & advance　<span class=\"kbd\">E</span> Set end (target depends on setting)<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> Move row　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> Seek audio by 2 seconds　<span class=\"kbd\">Z</span> Undo last operation<br><span class=\"kbd\">Ins</span> Insert below　<span class=\"kbd\">Shift+Ins</span> Insert above　<span class=\"kbd\">Del</span> Delete current row　<span class=\"kbd\">Backspace</span> Clear time<br>Draft export saves missing times as <span class=\"kbd\">--:--,---</span>.<br>Double-click a subtitle row to seek the audio to that row's start time.",
-      "setting.monitorInterval": "Preview/subtitle update interval",
+      "setting.monitorInterval": "Subtitle position mark update interval",
       "button.apply": "Apply",
       "label.outputFile": "SRT output filename",
       "button.preview": "Preview",
+      "button.previewVideoExport": "Preview / Video Export",
+      "sttv.title": "Preview / Simple Subtitle Video Export",
+      "sttv.section.image": "1. Image",
+      "sttv.imageFile": "Image file",
+      "sttv.clearImage": "Clear image",
+      "sttv.section.settings": "2. Settings",
+      "sttv.shortVideo": "Short video",
+      "sttv.imageFit": "Image fit",
+      "sttv.videoOptionsHint": "When unchecked, output is landscape (16:9 / 1280×720). When checked, output is vertical (9:16 / 720×1280). Image fit starts with full image at the left and zooms in toward the right.",
+      "sttv.subtitleY": "Subtitle height",
+      "sttv.fontSize": "Font size",
+      "sttv.useOutline": "Text outline",
+      "sttv.useBand": "Black band",
+      "sttv.subtitleHint": "Subtitle width is fixed at 90%. Long subtitles wrap automatically.",
+      "sttv.resetSettings": "Reset settings",
+      "sttv.section.create": "3. Create",
+      "sttv.button.createVideo": "Create video",
+      "sttv.button.cancel": "Cancel",
+      "sttv.button.save": "Save",
+      "sttv.videoPreview": "Video preview",
+      "sttv.audioSubtitlePreview": "Audio / subtitle preview",
+      "sttv.previewHint": "This preview is dedicated to video export. It stops automatically when recording starts.",
+      "sttv.status.image": "Image",
+      "sttv.status.audio": "Audio",
+      "sttv.status.subtitles": "Subtitles",
+      "sttv.status.notLoaded": "not loaded",
+      "sttv.status.audioNotLoaded": "not loaded (load audio in the main app first)",
+      "sttv.status.subtitleNotReady": "not ready (no rows with both start and end times)",
+      "sttv.status.lines": "rows",
+      "sttv.record.ready": "Ready to record.",
+      "sttv.record.done": "Done. You can save the WebM file.",
+      "sttv.record.cancelled": "Cancelled.",
+      "sttv.record.noData": "No recording data was created.",
+      "sttv.record.emptyData": "The recording data was empty.",
+      "sttv.record.starting": "Starting recording. Wait for the full audio length. Keep this tab in the foreground.",
+      "sttv.record.recording": "Recording",
+      "sttv.record.keepFront": "Keep this tab in the foreground.",
+      "sttv.record.confirmStart": "If you switch browser tabs during recording, the WebM may be created without subtitles.\nKeep this tab in the foreground until recording finishes.\n\nStart video creation?",
+      "sttv.record.cancelBeforeStart": "Video creation was cancelled.",
+      "sttv.error.materialsMissing": "Image, audio, and subtitles are not ready. Select an image, then load audio and prepare completed subtitle rows in the main app.",
+      "sttv.error.browserUnsupported": "This browser does not support recording. Try Chrome or Edge.",
+      "sttv.error.imageLoad": "Could not load the image.",
+      "sttv.error.clearImageRecording": "You cannot clear the image while recording.",
+      "sttv.error.duration": "Could not get the audio duration.",
+      "sttv.error.audioCapture": "This browser does not support recording an audio stream. Try Chrome or Edge.",
+      "sttv.error.recorder": "Could not start WebM recording in this browser.",
+      "sttv.error.recording": "An error occurred while recording.",
+      "sttv.error.generic": "Error",
+      "sttv.canvas.noImage": "Image preview",
       "button.saveSrt": "Save SRT",
-      "preview.title": "Subtitle preview",
       "preview.close": "Close",
-      "preview.restart": "Play from start position",
-      "preview.hint": "Only rows with both start and end times, and with end later than start, are shown centered. The preview uses the same update interval as the playback marker. Closing the preview restores the editor audio position.",
       "section.selectedEditor": "Selected row editor",
       "label.editStart": "Start",
       "label.editEnd": "End",
@@ -1094,13 +1436,11 @@
     });
     updateStatus();
     if (waveformStatus) waveformStatus.textContent = tr(waveformMessageKey);
+    if (videoExport && typeof videoExport.refreshLanguage === "function") videoExport.refreshLanguage();
     drawWaveform();
   }
 
   const audio = $("audio");
-  const previewModal = $("previewModal");
-  const previewAudio = $("previewAudio");
-  const previewCaption = $("previewCaption");
   const lyricsFile = $("lyricsFile");
   const audioFile = $("audioFile");
   const lyricsText = $("lyricsText");
@@ -1113,15 +1453,13 @@
   const editSubtitleText = $("editSubtitleText");
   const waveformCanvas = $("waveformCanvas");
   const waveformStatus = $("waveformStatus");
+  const videoExportModal = $("sttvVideoExportModal");
+
 
   let lines = [];
   let currentIndex = 0;
   let activeIndex = null;
   let audioObjectUrl = null;
-  let previewOpen = false;
-  let previewStartTime = 0;
-  let previewReturnTime = 0;
-  let previewTimer = null;
   let sourceBaseName = "subtitles";
   let outputNameTouched = false;
   let undoStack = [];
@@ -1133,6 +1471,8 @@
   let waveformMessageKey = "waveform.noAudio";
   let currentAudioFile = null;
   let selectedEditorDirty = false;
+  let videoExportOpen = false;
+  let videoExport = null;
 
   outputFileName.addEventListener("input", () => outputNameTouched = true);
 
@@ -2156,72 +2496,764 @@
     });
   }
 
-  function getPreviewableLines() {
-    return lines.filter(line =>
-      line.start != null &&
-      line.end != null &&
-      line.end > line.start
-    );
+
+  function createVideoExportPanel(root, options = {}) {
+    if (!root) throw new Error("Video export root element is required.");
+
+    const doc = root.ownerDocument || document;
+    const find = (id) => root.querySelector("#" + id);
+    const els = {
+      imageInput: find("sttvImageFile"),
+      clearImageButton: find("sttvClearImageButton"),
+      fileStatus: find("sttvFileStatus"),
+      shortVideo: find("sttvShortVideo"),
+      imageFit: find("sttvImageFit"),
+      imageFitValue: find("sttvImageFitValue"),
+      subtitleY: find("sttvSubtitleY"),
+      subtitleYValue: find("sttvSubtitleYValue"),
+      fontSize: find("sttvFontSize"),
+      fontSizeValue: find("sttvFontSizeValue"),
+      useOutline: find("sttvUseOutline"),
+      useBand: find("sttvUseBand"),
+      videoInfo: find("sttvVideoInfo"),
+      canvas: find("sttvPreviewCanvas"),
+      previewAudio: find("sttvPreviewAudio"),
+      recordStatus: find("sttvRecordStatus"),
+      progressBar: find("sttvProgressBar"),
+      recordButton: find("sttvRecordButton"),
+      cancelButton: find("sttvCancelButton"),
+      downloadLink: find("sttvDownloadLink"),
+      resetButton: find("sttvResetButton")
+    };
+
+    const ctx = els.canvas.getContext("2d");
+    const state = {
+      imageObj: null,
+      imageUrl: "",
+      audioUrl: "",
+      subtitles: [],
+      sourceNames: { image: "", audio: "", srt: "" },
+      renderLoopId: null,
+      activeRecorder: null,
+      activeRecordAudio: null,
+      cancelRequested: false,
+      lastDownloadUrl: "",
+      lastDownloadSize: 0,
+      activeStreams: []
+    };
+
+    function parseCanvasSize() {
+      return els.shortVideo.checked
+        ? { width: 720, height: 1280 }
+        : { width: 1280, height: 720 };
+    }
+
+    function setupCanvasSize() {
+      const size = parseCanvasSize();
+      if (els.canvas.width !== size.width || els.canvas.height !== size.height) {
+        els.canvas.width = size.width;
+        els.canvas.height = size.height;
+      }
+      els.videoInfo.textContent = `${size.width}×${size.height} / WebM`;
+    }
+
+    function setStatus() {
+      const lines = [];
+      lines.push(state.imageObj
+        ? `${tr("sttv.status.image")}: ${state.sourceNames.image}`
+        : `${tr("sttv.status.image")}: ${tr("sttv.status.notLoaded")}`);
+      lines.push(state.audioUrl
+        ? `${tr("sttv.status.audio")}: ${state.sourceNames.audio}`
+        : `${tr("sttv.status.audio")}: ${tr("sttv.status.audioNotLoaded")}`);
+      lines.push(state.subtitles.length
+        ? `${tr("sttv.status.subtitles")}: ${state.sourceNames.srt} / ${state.subtitles.length}${tr("sttv.status.lines")}`
+        : `${tr("sttv.status.subtitles")}: ${tr("sttv.status.subtitleNotReady")}`);
+      els.fileStatus.textContent = lines.join("\n");
+      els.recordButton.disabled = !(state.imageObj && state.audioUrl && state.subtitles.length) || !!state.activeRecorder;
+      els.clearImageButton.disabled = !state.imageObj || !!state.activeRecorder;
+    }
+
+    function revokeLastDownloadUrl() {
+      if (state.lastDownloadUrl) {
+        URL.revokeObjectURL(state.lastDownloadUrl);
+        state.lastDownloadUrl = "";
+        state.lastDownloadSize = 0;
+      }
+    }
+
+    function cleanupSubtitleText(text) {
+      return String(text ?? "")
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<[^>]*>/g, "")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">");
+    }
+
+    function normalizeSubtitles(items) {
+      if (!Array.isArray(items)) return [];
+      return items
+        .filter(item =>
+          item &&
+          Number.isFinite(Number(item.start)) &&
+          Number.isFinite(Number(item.end)) &&
+          Number(item.end) > Number(item.start) &&
+          String(item.text ?? "").trim()
+        )
+        .map(item => ({
+          start: Number(item.start),
+          end: Number(item.end),
+          text: cleanupSubtitleText(String(item.text ?? "").replace(/\\n/g, "\n"))
+        }))
+        .sort((a, b) => a.start - b.start);
+    }
+
+    async function loadImageFile(file) {
+      if (!file) return;
+      if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
+      state.imageUrl = URL.createObjectURL(file);
+      state.sourceNames.image = file.name || "image";
+      state.imageObj = new Image();
+      state.imageObj.onload = () => {
+        drawFrame(els.previewAudio.currentTime || 0, false);
+        setStatus();
+      };
+      state.imageObj.onerror = () => {
+        state.imageObj = null;
+        setStatus();
+        els.recordStatus.textContent = tr("sttv.error.imageLoad");
+      };
+      state.imageObj.src = state.imageUrl;
+    }
+
+    function clearImage() {
+      if (state.activeRecorder) {
+        els.recordStatus.textContent = tr("sttv.error.clearImageRecording");
+        return;
+      }
+      if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
+      state.imageUrl = "";
+      state.imageObj = null;
+      state.sourceNames.image = "";
+      els.imageInput.value = "";
+      drawFrame(els.previewAudio.currentTime || 0, false);
+      setStatus();
+    }
+
+    function setAudioUrl(url, name = "audio") {
+      state.audioUrl = url || "";
+      state.sourceNames.audio = name || "audio";
+      if (state.audioUrl) {
+        if (els.previewAudio.src !== state.audioUrl) els.previewAudio.src = state.audioUrl;
+      } else {
+        els.previewAudio.pause();
+        els.previewAudio.removeAttribute("src");
+        els.previewAudio.load();
+      }
+      drawFrame(els.previewAudio.currentTime || 0, false);
+      setStatus();
+    }
+
+    function setSubtitles(items, name = "SRT Tap Timer lines") {
+      state.subtitles = normalizeSubtitles(items);
+      state.sourceNames.srt = name;
+      drawFrame(els.previewAudio.currentTime || 0, false);
+      setStatus();
+    }
+
+    function findSubtitle(time) {
+      for (const item of state.subtitles) {
+        if (time >= item.start && time < item.end) return item.text;
+        if (item.start > time) break;
+      }
+      return "";
+    }
+
+    function drawBackground() {
+      ctx.save();
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, els.canvas.width, els.canvas.height);
+
+      if (!state.imageObj) {
+        ctx.fillStyle = "#1e2330";
+        ctx.fillRect(0, 0, els.canvas.width, els.canvas.height);
+        ctx.fillStyle = "#aab0bf";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = `${Math.max(22, els.canvas.width * 0.03)}px sans-serif`;
+        ctx.fillText(tr("sttv.canvas.noImage"), els.canvas.width / 2, els.canvas.height / 2);
+        ctx.restore();
+        return;
+      }
+
+      const sw = state.imageObj.width;
+      const sh = state.imageObj.height;
+      const cw = els.canvas.width;
+      const ch = els.canvas.height;
+      const scaleInfo = getImageScaleInfo();
+      const scale = scaleInfo.scale;
+      const dw = sw * scale;
+      const dh = sh * scale;
+      const dx = (cw - dw) / 2;
+      const dy = (ch - dh) / 2;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(state.imageObj, dx, dy, dw, dh);
+      ctx.restore();
+    }
+
+    function wrapSubtitle(text, maxW) {
+      const out = [];
+      const rawLines = String(text || "").split("\n");
+
+      for (const raw of rawLines) {
+        const line = raw.trim();
+        if (!line) { out.push(""); continue; }
+        let current = "";
+
+        for (const ch of Array.from(line)) {
+          const test = current + ch;
+          if (ctx.measureText(test).width > maxW && current) {
+            out.push(current);
+            current = ch;
+          } else {
+            current = test;
+          }
+        }
+        if (current) out.push(current);
+      }
+
+      return out.slice(0, 6);
+    }
+
+    function roundRect(canvasContext, x, y, w, h, r) {
+      const radius = Math.min(r, w / 2, h / 2);
+      canvasContext.beginPath();
+      canvasContext.moveTo(x + radius, y);
+      canvasContext.arcTo(x + w, y, x + w, y + h, radius);
+      canvasContext.arcTo(x + w, y + h, x, y + h, radius);
+      canvasContext.arcTo(x, y + h, x, y, radius);
+      canvasContext.arcTo(x, y, x + w, y, radius);
+      canvasContext.closePath();
+    }
+
+    function drawSubtitle(text) {
+      const fs = Number(els.fontSize.value) || 45;
+      const outline = els.useOutline.checked ? 6 : 0;
+      const y = els.canvas.height * ((Number(els.subtitleY.value) || 84) / 100);
+      const maxTextWidth = els.canvas.width * 0.90;
+      const lineHeight = fs * 1.25;
+
+      ctx.save();
+      ctx.font = `450 ${fs}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineJoin = "round";
+
+      const lines = wrapSubtitle(text, maxTextWidth);
+      const totalHeight = lines.length * lineHeight;
+      const firstY = y - totalHeight / 2 + lineHeight / 2;
+
+      if (els.useBand.checked && lines.length) {
+        const padY = fs * 0.34;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.48)";
+        roundRect(ctx, els.canvas.width * 0.05, firstY - lineHeight / 2 - padY, els.canvas.width * 0.90, totalHeight + padY * 2, Math.max(10, fs * 0.18));
+        ctx.fill();
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const yy = firstY + i * lineHeight;
+        if (outline > 0) {
+          ctx.strokeStyle = "#000";
+          ctx.lineWidth = outline;
+          ctx.strokeText(lines[i], els.canvas.width / 2, yy);
+        }
+        ctx.fillStyle = "#fff";
+        ctx.fillText(lines[i], els.canvas.width / 2, yy);
+      }
+
+      ctx.restore();
+    }
+
+    function drawFrame(time, useRealTime) {
+      setupCanvasSize();
+      drawBackground();
+      const text = findSubtitle(time);
+      if (text) drawSubtitle(text);
+    }
+
+    function getImageScaleInfo() {
+      const fitRatio = Math.max(0, Math.min(1, (Number(els.imageFit.value) || 0) / 100));
+      if (!state.imageObj) {
+        const ratio = 1 + (1.77 - 1) * fitRatio;
+        return { scale: 1, ratio };
+      }
+      const sw = state.imageObj.width;
+      const sh = state.imageObj.height;
+      const cw = els.canvas.width;
+      const ch = els.canvas.height;
+      const containScale = Math.min(cw / sw, ch / sh);
+      const coverScale = Math.max(cw / sw, ch / sh);
+      const maxScale = Math.max(coverScale, containScale * 1.77);
+      const scale = containScale + (maxScale - containScale) * fitRatio;
+      const ratio = containScale > 0 ? scale / containScale : 1;
+      return { scale, ratio };
+    }
+
+    function redraw() {
+      setupCanvasSize();
+      els.imageFitValue.textContent = `x${getImageScaleInfo().ratio.toFixed(2)}`;
+      els.subtitleYValue.textContent = `${els.subtitleY.value}%`;
+      els.fontSizeValue.textContent = els.fontSize.value;
+      drawFrame(els.previewAudio.currentTime || 0, false);
+    }
+
+    function startPreviewLoop() {
+      stopPreviewLoop();
+      const loop = () => {
+        drawFrame(els.previewAudio.currentTime || 0, true);
+        state.renderLoopId = requestAnimationFrame(loop);
+      };
+      loop();
+    }
+
+    function stopPreviewLoop() {
+      if (state.renderLoopId) {
+        cancelAnimationFrame(state.renderLoopId);
+        state.renderLoopId = null;
+      }
+    }
+
+    function pausePreview() {
+      stopPreviewLoop();
+      els.previewAudio.pause();
+    }
+
+    function stopStream(stream) {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+    }
+
+    function stopAllActiveStreams() {
+      for (const stream of state.activeStreams) stopStream(stream);
+      state.activeStreams = [];
+    }
+
+    function createCanvasStream() {
+      let stream = els.canvas.captureStream(0);
+      let track = stream.getVideoTracks()[0] || null;
+      const manualFrame = track && typeof track.requestFrame === "function";
+
+      if (!manualFrame) {
+        stopStream(stream);
+        stream = els.canvas.captureStream(30);
+        track = stream.getVideoTracks()[0] || null;
+      }
+
+      return { stream, track, manualFrame };
+    }
+
+    async function startRecording() {
+      if (typeof options.beforeRecord === "function") options.beforeRecord();
+
+      if (!(state.imageObj && state.audioUrl && state.subtitles.length)) {
+        els.recordStatus.textContent = tr("sttv.error.materialsMissing");
+        setStatus();
+        return;
+      }
+      if (state.activeRecorder) return;
+      if (!window.MediaRecorder || !els.canvas.captureStream) {
+        alert(tr("sttv.error.browserUnsupported"));
+        return;
+      }
+      if (!confirm(tr("sttv.record.confirmStart"))) {
+        els.recordStatus.textContent = tr("sttv.record.cancelBeforeStart");
+        return;
+      }
+
+      stopPreviewLoop();
+      els.previewAudio.pause();
+
+      els.recordButton.disabled = true;
+      els.cancelButton.disabled = false;
+      els.downloadLink.classList.add("sttv-hidden");
+      els.downloadLink.removeAttribute("href");
+      els.progressBar.value = 0;
+      state.cancelRequested = false;
+      revokeLastDownloadUrl();
+      stopAllActiveStreams();
+
+      let canvasStream = null;
+      let audioStream = null;
+
+      try {
+        setupCanvasSize();
+
+        const fps = 30;
+        const canvasSetup = createCanvasStream();
+        canvasStream = canvasSetup.stream;
+        const canvasVideoTrack = canvasSetup.track;
+        const manualFrame = canvasSetup.manualFrame;
+        state.activeStreams.push(canvasStream);
+
+        const recordAudio = doc.createElement("audio");
+        recordAudio.src = state.audioUrl;
+        recordAudio.preload = "auto";
+        state.activeRecordAudio = recordAudio;
+        await waitForLoadedMetadata(recordAudio);
+
+        const duration = recordAudio.duration || (state.subtitles.length ? state.subtitles[state.subtitles.length - 1].end : 0);
+        if (!Number.isFinite(duration) || duration <= 0) {
+          throw new Error(tr("sttv.error.duration"));
+        }
+
+        const capture = recordAudio.captureStream || recordAudio.mozCaptureStream;
+        if (!capture) {
+          throw new Error(tr("sttv.error.audioCapture"));
+        }
+
+        audioStream = capture.call(recordAudio);
+        state.activeStreams.push(audioStream);
+
+        const mixedStream = new MediaStream([
+          ...canvasStream.getVideoTracks(),
+          ...audioStream.getAudioTracks()
+        ]);
+
+        const recorderSetup = createRecorder(mixedStream);
+        if (!recorderSetup) {
+          throw new Error(tr("sttv.error.recorder"));
+        }
+
+        const { recorder, mimeType } = recorderSetup;
+        state.activeRecorder = recorder;
+        const chunks = [];
+
+        recorder.ondataavailable = ev => {
+          if (ev.data && ev.data.size > 0) chunks.push(ev.data);
+        };
+
+        recorder.onerror = ev => {
+          console.error("MediaRecorder error", ev);
+          els.recordStatus.textContent = tr("sttv.error.recording");
+          safeStopRecorder();
+        };
+
+        recorder.onstop = () => {
+          stopAllActiveStreams();
+
+          if (state.cancelRequested) {
+            els.recordStatus.textContent = tr("sttv.record.cancelled");
+            finishRecordingUi();
+            return;
+          }
+
+          if (!chunks.length) {
+            els.recordStatus.textContent = tr("sttv.record.noData");
+            finishRecordingUi();
+            return;
+          }
+
+          const blob = new Blob(chunks, { type: mimeType || "video/webm" });
+          if (!blob.size) {
+            els.recordStatus.textContent = tr("sttv.record.emptyData");
+            finishRecordingUi();
+            return;
+          }
+
+          const url = URL.createObjectURL(blob);
+          state.lastDownloadUrl = url;
+          const baseName = state.sourceNames.audio ? state.sourceNames.audio.replace(/\.[^.]+$/, "") : "subtitled_video";
+          els.downloadLink.href = url;
+          els.downloadLink.download = `${baseName}_subtitled.webm`;
+          state.lastDownloadSize = blob.size;
+          els.downloadLink.textContent = `${tr("sttv.button.save")}（${formatBytes(blob.size)}）`;
+          els.downloadLink.classList.remove("sttv-hidden");
+          els.recordStatus.textContent = tr("sttv.record.done");
+          els.progressBar.value = 1;
+          finishRecordingUi();
+        };
+
+        let nextFrameAt = 0;
+        const frameInterval = 1000 / fps;
+
+        const requestCanvasFrame = () => {
+          if (manualFrame && canvasVideoTrack && typeof canvasVideoTrack.requestFrame === "function") {
+            canvasVideoTrack.requestFrame();
+          }
+        };
+
+        const renderRecording = (now = performance.now()) => {
+          if (!state.activeRecorder || recorder.state === "inactive") return;
+
+          if (now >= nextFrameAt) {
+            drawFrame(recordAudio.currentTime || 0, true);
+            requestCanvasFrame();
+            nextFrameAt = now + frameInterval;
+          }
+
+          els.progressBar.value = Math.min(1, (recordAudio.currentTime || 0) / duration);
+          els.recordStatus.textContent = `${tr("sttv.record.recording")}: ${formatRecordTime(recordAudio.currentTime || 0)} / ${formatRecordTime(duration)}\n${tr("sttv.record.keepFront")}`;
+          requestAnimationFrame(renderRecording);
+        };
+
+        recordAudio.onended = () => {
+          drawFrame(duration, true);
+          requestCanvasFrame();
+          safeStopRecorder();
+        };
+
+        recorder.start(1000);
+        drawFrame(0, true);
+        requestCanvasFrame();
+        renderRecording();
+        els.recordStatus.textContent = tr("sttv.record.starting");
+        await recordAudio.play();
+
+      } catch (err) {
+        console.error(err);
+        stopAllActiveStreams();
+        els.recordStatus.textContent = `${tr("sttv.error.generic")}: ${err.message || err}`;
+        finishRecordingUi();
+      }
+    }
+
+    function createRecorder(stream) {
+      const pixels = els.canvas.width * els.canvas.height;
+      const optionsBase = {
+        videoBitsPerSecond: pixels >= 800000 ? 4_000_000 : 3_000_000,
+        audioBitsPerSecond: 192_000
+      };
+      const candidates = [
+        "video/webm;codecs=vp9,opus",
+        "video/webm;codecs=vp8,opus",
+        "video/webm"
+      ];
+
+      for (const type of candidates) {
+        if (type && !MediaRecorder.isTypeSupported(type)) continue;
+        try {
+          const recorder = new MediaRecorder(stream, { ...optionsBase, mimeType: type });
+          return { recorder, mimeType: type };
+        } catch (e) {
+          console.warn("MediaRecorder failed for", type, e);
+        }
+      }
+
+      try {
+        const recorder = new MediaRecorder(stream, optionsBase);
+        return { recorder, mimeType: recorder.mimeType || "video/webm" };
+      } catch (e) {
+        console.warn("MediaRecorder failed without mimeType", e);
+        return null;
+      }
+    }
+
+    function safeStopRecorder() {
+      if (state.activeRecorder && state.activeRecorder.state !== "inactive") {
+        state.activeRecorder.stop();
+      }
+    }
+
+    function finishRecordingUi() {
+      els.recordButton.disabled = !(state.imageObj && state.audioUrl && state.subtitles.length);
+      els.cancelButton.disabled = true;
+      state.activeRecorder = null;
+      state.activeRecordAudio = null;
+      setStatus();
+    }
+
+    function cancelRecording() {
+      state.cancelRequested = true;
+      if (state.activeRecordAudio) {
+        state.activeRecordAudio.pause();
+        try { state.activeRecordAudio.currentTime = 0; } catch (_) {}
+      }
+      safeStopRecorder();
+      if (!state.activeRecorder) {
+        stopAllActiveStreams();
+        finishRecordingUi();
+      }
+    }
+
+    function formatBytes(bytes) {
+      if (!Number.isFinite(bytes)) return "";
+      const units = ["B", "KB", "MB", "GB"];
+      let size = bytes;
+      let i = 0;
+      while (size >= 1024 && i < units.length - 1) { size /= 1024; i++; }
+      return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+    }
+
+    function formatRecordTime(t) {
+      const total = Math.max(0, Number(t) || 0);
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = Math.floor(total % 60);
+      const ms = Math.round((total - Math.floor(total)) * 1000);
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
+    }
+
+    function waitForLoadedMetadata(target) {
+      return new Promise((resolve, reject) => {
+        if (target.readyState >= 1 && Number.isFinite(target.duration) && target.duration > 0) {
+          resolve();
+          return;
+        }
+
+        const onMeta = () => { cleanup(); resolve(); };
+        const onError = () => { cleanup(); reject(new Error("load failed")); };
+        const cleanup = () => {
+          target.removeEventListener("loadedmetadata", onMeta);
+          target.removeEventListener("error", onError);
+        };
+
+        target.addEventListener("loadedmetadata", onMeta, { once: true });
+        target.addEventListener("error", onError, { once: true });
+      });
+    }
+
+    function resetSettings() {
+      els.shortVideo.checked = false;
+      els.imageFit.value = 0;
+      els.subtitleY.value = 84;
+      els.fontSize.value = 45;
+      els.useOutline.checked = true;
+      els.useBand.checked = false;
+      redraw();
+    }
+
+    function refreshLanguage() {
+      setStatus();
+      redraw();
+      if (!state.activeRecorder) {
+        els.recordStatus.textContent = state.lastDownloadUrl ? tr("sttv.record.done") : tr("sttv.record.ready");
+        if (state.lastDownloadUrl && state.lastDownloadSize) {
+          els.downloadLink.textContent = `${tr("sttv.button.save")}（${formatBytes(state.lastDownloadSize)}）`;
+        }
+      }
+    }
+
+    function destroy() {
+      pausePreview();
+      stopAllActiveStreams();
+      revokeLastDownloadUrl();
+      if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
+      state.imageUrl = "";
+      state.imageObj = null;
+      els.previewAudio.pause();
+      els.previewAudio.removeAttribute("src");
+      els.previewAudio.load();
+    }
+
+    function getState() {
+      return {
+        hasImage: !!state.imageObj,
+        hasAudio: !!state.audioUrl,
+        subtitleCount: state.subtitles.length,
+        recording: !!state.activeRecorder
+      };
+    }
+
+    function bindEvents() {
+      els.imageInput.addEventListener("change", () => {
+        const file = els.imageInput.files && els.imageInput.files[0];
+        if (file) loadImageFile(file);
+      });
+
+      els.clearImageButton.addEventListener("click", clearImage);
+
+      [els.shortVideo, els.imageFit, els.subtitleY, els.fontSize, els.useOutline, els.useBand].forEach(el => {
+        el.addEventListener("input", redraw);
+        el.addEventListener("change", redraw);
+      });
+
+      els.previewAudio.addEventListener("play", startPreviewLoop);
+      els.previewAudio.addEventListener("pause", () => {
+        stopPreviewLoop();
+        drawFrame(els.previewAudio.currentTime || 0, false);
+      });
+      els.previewAudio.addEventListener("seeked", () => drawFrame(els.previewAudio.currentTime || 0, false));
+      els.previewAudio.addEventListener("timeupdate", () => {
+        if (els.previewAudio.paused) drawFrame(els.previewAudio.currentTime || 0, false);
+      });
+
+      els.recordButton.addEventListener("click", startRecording);
+      els.cancelButton.addEventListener("click", cancelRecording);
+      els.resetButton.addEventListener("click", resetSettings);
+
+      root.addEventListener("dragover", ev => {
+        ev.preventDefault();
+        ev.dataTransfer.dropEffect = "copy";
+      });
+      root.addEventListener("drop", ev => {
+        ev.preventDefault();
+        const files = Array.from(ev.dataTransfer.files || []);
+        const imageFile = files.find(file => file.type && file.type.startsWith("image/"));
+        if (imageFile) loadImageFile(imageFile);
+      });
+    }
+
+    bindEvents();
+    setupCanvasSize();
+    redraw();
+    setStatus();
+    els.recordStatus.textContent = tr("sttv.record.ready");
+
+    return {
+      loadImageFile,
+      clearImage,
+      setAudioUrl,
+      setSubtitles,
+      drawFrame,
+      startRecording,
+      cancelRecording,
+      resetSettings,
+      pausePreview,
+      refreshLanguage,
+      destroy,
+      getState
+    };
   }
 
-  function getPreviewCaptionText(t) {
-    const active = [];
-    for (const line of lines) {
-      if (
+  function ensureVideoExport() {
+    if (!videoExport) {
+      videoExport = createVideoExportPanel($("sttvRoot"), {
+        beforeRecord: syncVideoExportData
+      });
+    }
+    return videoExport;
+  }
+
+  function buildVideoSubtitlesFromLines() {
+    return lines
+      .filter(line =>
+        line &&
         line.start != null &&
         line.end != null &&
         line.end > line.start &&
-        t >= line.start &&
-        t < line.end
-      ) {
-        const text = decodeLineBreakMarkers(line.text).trim();
-        if (text) active.push(text);
-      }
-    }
-    return active.join("\n");
+        String(line.text ?? "").trim()
+      )
+      .map(line => ({
+        start: line.start,
+        end: line.end,
+        text: decodeLineBreakMarkers(line.text)
+      }));
   }
 
-  function updatePreviewCaption() {
-    if (!previewOpen) return;
-    const text = getPreviewCaptionText(previewAudio.currentTime || 0);
-    previewCaption.textContent = text;
-    previewCaption.classList.toggle("empty", !text);
+  function syncVideoExportData() {
+    const instance = ensureVideoExport();
+    instance.setAudioUrl(audioObjectUrl || "", currentAudioFile ? currentAudioFile.name : (sourceBaseName || "audio"));
+    instance.setSubtitles(buildVideoSubtitlesFromLines(), "SRT Tap Timer lines");
   }
 
-  function startPreviewPlayback() {
-    if (!previewOpen) return;
-
-    const duration = previewAudio.duration;
-    const target = Number.isFinite(duration)
-      ? Math.max(0, Math.min(duration, previewStartTime))
-      : Math.max(0, previewStartTime);
-
-    try {
-      previewAudio.currentTime = target;
-    } catch (err) {
-      // Some browsers may reject currentTime before metadata is fully ready.
-    }
-
-    updatePreviewCaption();
-
-    const p = previewAudio.play();
-    if (p && typeof p.catch === "function") {
-      p.catch(() => {
-        log(currentLang === "ja"
-          ? "プレビューの自動再生がブロックされました。プレビュー画面の再生ボタンを押してください。"
-          : "Preview autoplay was blocked. Press the play button in the preview."
-        );
-      });
-    }
-  }
-
-  function openPreview() {
-    if (!audio.src) {
+  function openVideoExport() {
+    if (!audio.paused) audio.pause();
+    if (!audioObjectUrl && !audio.src) {
       log(currentLang === "ja" ? "先に音源ファイルを読み込んでください。" : "Load an audio/media file first.");
       return;
     }
-
-    const previewable = getPreviewableLines();
+    const previewable = buildVideoSubtitlesFromLines();
     if (!previewable.length) {
       log(currentLang === "ja"
         ? "プレビューできる字幕行がありません。開始・終了の両方があり、終了が開始より後の行だけを表示します。"
@@ -2229,78 +3261,25 @@
       );
       return;
     }
-
-    previewReturnTime = audio.currentTime || 0;
-    previewStartTime = previewReturnTime;
-
-    audio.pause();
-
-    previewOpen = true;
-    previewModal.classList.add("show");
-    previewModal.setAttribute("aria-hidden", "false");
-    previewCaption.textContent = "";
-    previewCaption.classList.add("empty");
-
-    previewAudio.pause();
-    previewAudio.src = audio.currentSrc || audio.src;
-    previewAudio.load();
-
-    if (previewTimer) clearInterval(previewTimer);
-    previewTimer = setInterval(updatePreviewCaption, monitorIntervalMs);
-
-    const onReady = () => startPreviewPlayback();
-
-    if (previewAudio.readyState >= 1) {
-      onReady();
-    } else {
-      previewAudio.addEventListener("loadedmetadata", onReady, { once: true });
-    }
-
-    log(currentLang === "ja"
-      ? `字幕プレビューを開始しました。表示対象: ${previewable.length}行`
-      : `Started subtitle preview. Previewable rows: ${previewable.length}`
-    );
+    const instance = ensureVideoExport();
+    syncVideoExportData();
+    videoExportOpen = true;
+    videoExportModal.classList.add("show");
+    videoExportModal.setAttribute("aria-hidden", "false");
+    instance.drawFrame(audio.currentTime || 0, false);
   }
 
-  function restartPreview() {
-    if (!previewOpen) return;
-    startPreviewPlayback();
-  }
-
-  function closePreview() {
-    if (!previewOpen) return;
-
-    previewOpen = false;
-
-    if (previewTimer) {
-      clearInterval(previewTimer);
-      previewTimer = null;
+  function closeVideoExport() {
+    if (!videoExportOpen) return;
+    if (videoExport && videoExport.getState().recording) {
+      alert(currentLang === "ja" ? "録画中は閉じられません。中止ボタンで録画を止めてから閉じてください。" : "Cannot close while recording. Stop recording with the Cancel button first.");
+      return;
     }
-
-    previewAudio.pause();
-    previewAudio.removeAttribute("src");
-    previewAudio.load();
-
-    previewModal.classList.remove("show");
-    previewModal.setAttribute("aria-hidden", "true");
-    previewCaption.textContent = "";
-    previewCaption.classList.add("empty");
-
-    if (audio.src) {
-      try {
-        audio.currentTime = previewReturnTime;
-      } catch (err) {
-        // Ignore restore errors for unusual media sources.
-      }
-    }
-
-    updateStatus();
+    if (videoExport) videoExport.pausePreview();
+    videoExportOpen = false;
+    videoExportModal.classList.remove("show");
+    videoExportModal.setAttribute("aria-hidden", "true");
     focusApp();
-
-    log(currentLang === "ja"
-      ? "字幕プレビューを閉じました。編集用の音源位置をプレビュー開始前に戻しました。"
-      : "Closed subtitle preview. Restored the editor audio position."
-    );
   }
 
   function getExportProblemCounts() {
@@ -2774,12 +3753,8 @@
   $("markStartBtn").addEventListener("click", markStart);
   $("markEndBtn").addEventListener("click", markEnd);
   $("undoBtn").addEventListener("click", undo);
-  $("previewBtn").addEventListener("click", openPreview);
-  $("previewRestartBtn").addEventListener("click", restartPreview);
-  $("previewCloseBtn").addEventListener("click", closePreview);
-  $("previewCloseX").addEventListener("click", closePreview);
-  previewAudio.addEventListener("timeupdate", updatePreviewCaption);
-  previewAudio.addEventListener("seeked", updatePreviewCaption);
+  $("previewBtn").addEventListener("click", openVideoExport);
+  $("sttvVideoExportCloseX").addEventListener("click", closeVideoExport);
   $("exportBtn").addEventListener("click", exportSrt);
   $("insertRowAboveBtn").addEventListener("click", insertRowAbove);
   $("insertRowBelowBtn").addEventListener("click", insertRowBelow);
@@ -2843,25 +3818,15 @@
   document.addEventListener("keydown", (ev) => {
     if (isEditableTarget(ev)) return;
 
-    if (previewOpen) {
+    if (videoExportOpen) {
       if (ev.key === "Escape") {
         ev.preventDefault();
-        closePreview();
-      } else if (ev.key.toLowerCase() === " ") {
-        ev.preventDefault();
-        if (previewAudio.paused) previewAudio.play();
-        else previewAudio.pause();
-      } else if (ev.key === "ArrowLeft") {
-        ev.preventDefault();
-        previewAudio.currentTime = Math.max(0, (previewAudio.currentTime || 0) - 2);
-      } else if (ev.key === "ArrowRight") {
-        ev.preventDefault();
-        const max = Number.isFinite(previewAudio.duration) ? previewAudio.duration : Infinity;
-        previewAudio.currentTime = Math.max(0, Math.min(max, (previewAudio.currentTime || 0) + 2));
+        closeVideoExport();
+      } else if (ev.target && ev.target.closest && ev.target.closest(".sttv-root")) {
+        return;
       } else {
         ev.preventDefault();
       }
-      updatePreviewCaption();
       return;
     }
 
