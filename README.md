@@ -16,7 +16,7 @@ Open `index.html` on GitHub Pages, or download the standalone package from Relea
 
 ## Current version
 
-v1.28
+v1.44
 
 ## Main features
 
@@ -24,11 +24,17 @@ v1.28
 - Re-time existing SRT files.
 - Tap subtitle start timing with `R`.
 - Set end timing with `E`.
-- Support both new-timing mode and SRT re-editing mode.
+- Keep upcoming lyric rows visible with comfortable auto-scroll during real-time R/E tap input.
+- Support both beginner mode and advanced mode.
+- Show a local waveform around the current playback position.
+- Apply a tap input offset to `R` / `E` timing.
+- Auto-detect UTF-8 / Shift-JIS text encoding when loading lyric or SRT files.
+- Adjust waveform display timing independently from tap input timing.
+- Edit the selected row directly from the left-pane inspector.
+- Optionally remove ASCII parenthetical metadata lines such as `(Fade out)` during lyric extraction.
 - Save incomplete draft SRT files using `--:--,---`.
 - Reload draft SRT files and continue editing.
 - Preview completed subtitles in a modal preview screen.
-- Auto-suggest the last subtitle end time when only the final end time is missing.
 
 ## Privacy
 

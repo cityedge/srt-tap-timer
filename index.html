@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>SRT Tap Timer v1.28</title>
+<title>SRT Tap Timer v1.44</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
@@ -161,6 +161,148 @@
   }
   .row > * { flex: 0 0 auto; }
   .row .grow { flex: 1 1 auto; min-width: 0; }
+  .topSettingsRow {
+    display: flex;
+    gap: 8px;
+    align-items: end;
+    flex-wrap: wrap;
+    margin: 0 0 7px;
+  }
+  .textFileLoadRow {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 132px;
+    gap: 8px;
+    align-items: end;
+    margin-bottom: 8px;
+  }
+  .textFileLoadRow input[type="file"] {
+    margin: 0;
+  }
+  .encodingCompact {
+    width: 132px;
+  }
+  .encodingCompact label {
+    margin-top: 0;
+  }
+  .encodingCompact select {
+    width: 132px;
+    margin: 0;
+  }
+  .clearButtonBox {
+    display: flex;
+    gap: 6px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+  .clearButtonBox button {
+    padding: 6px 8px;
+    margin: 0;
+  }
+  .headerControls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  .headerControls .clearButtonBox {
+    align-items: center;
+  }
+  .headerControls .clearButtonBox button {
+    padding: 6px 8px;
+  }
+  .headerAdvancedToggle {
+    margin: 0;
+    white-space: nowrap;
+  }
+  .advancedToggle {
+    flex: 0 0 auto;
+    margin: 0 4px 7px 0;
+    align-self: end;
+  }
+  .tapOffsetInline,
+  .waveformOffsetInline,
+  .monitorIntervalInline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+  }
+  .inlineCheck {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .lyricsExtractRow .rightAction {
+    margin-left: auto;
+  }
+  .advancedOnly.is-hidden {
+    display: none !important;
+  }
+  .bulkShiftControls {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .bulkShiftControls .small {
+    white-space: nowrap;
+  }
+  @media (max-width: 760px) {
+    .textFileLoadRow {
+      grid-template-columns: 1fr;
+    }
+    .encodingCompact,
+    .encodingCompact select {
+      width: 100%;
+    }
+    .headerControls {
+      justify-content: flex-start;
+    }
+  }
+
+  .waveformBox {
+    margin: 7px 0 8px;
+    padding: 7px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #12161f;
+  }
+  .waveformHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+  .waveformStatus {
+    color: var(--muted);
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1 1 auto;
+    min-width: 80px;
+  }
+  .waveformEnableCheck {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .waveformCanvas {
+    display: block;
+    width: 100%;
+    height: 81px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #0c0f14;
+    cursor: default;
+  }
   .help {
     color: var(--muted);
     font-size: 11px;
@@ -188,6 +330,62 @@
     grid-template-columns: 1fr 1fr;
     gap: 7px;
     margin: 8px 0;
+  }
+  .compactStatusGrid {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  .selectedEditor {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px;
+    margin: 8px 0 10px;
+    background: #111722;
+  }
+  .selectedEditor .sectionTitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .selectedEditorGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .selectedEditor label {
+    display: block;
+    margin: 0;
+  }
+  .selectedEditor label span {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+  .selectedEditor input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .selectedTextLabel {
+    margin-top: 8px !important;
+  }
+  #editSubtitleText {
+    min-height: 54px;
+    max-height: 110px;
+    font-size: 13px;
+    line-height: 1.4;
+    font-family: inherit;
+    resize: vertical;
+    margin: 0;
+  }
+  .selectedEditorActions {
+    margin-top: 7px;
+  }
+  #selectedEditHint {
+    margin-top: 4px;
   }
   .card {
     background: #12161f;
@@ -235,7 +433,8 @@
     flex: 0 0 auto;
   }
   .toolbar input[type="number"] {
-    width: 82px;
+    width: 58px;
+    min-width: 58px;
   }
   .toolbarSep {
     display: inline-block;
@@ -481,17 +680,26 @@
 <body tabindex="-1">
 <header>
   <div class="headerMain">
-    <h1>SRT Tap Timer v1.28</h1>
+    <h1>SRT Tap Timer v1.44</h1>
     <div class="sub" data-i18n="app.subtitle">
       メタタグ付き歌詞テキストから歌詞行だけを抽出し、音源を聴きながらキーボードでSRTタイミングを打ち直すローカルツールです。
     </div>
   </div>
-  <div class="languageBox">
-    <span data-i18n="app.language">言語</span>
-    <select id="languageSelect">
-      <option value="ja">日本語</option>
-      <option value="en">English</option>
-    </select>
+  <div class="headerControls">
+    <label class="checkRow headerAdvancedToggle">
+      <input id="advancedMode" type="checkbox">
+      <span data-i18n="setting.advancedMode">上級者モード</span>
+    </label>
+    <div class="languageBox">
+      <span data-i18n="app.language">言語</span>
+      <select id="languageSelect">
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <div class="clearButtonBox">
+      <button id="clearAllBtn" class="danger" data-i18n="button.clearAll">オールクリア</button>
+    </div>
   </div>
 </header>
 
@@ -499,21 +707,26 @@
   <section class="leftPane">
     <h2 data-i18n="section.loadPlaySave">読み込み・再生・保存</h2>
 
-    <label data-i18n="label.encoding">文字コード</label>
-    <select id="encodingSelect">
-      <option value="utf-8" selected>UTF-8</option>
-      <option value="shift_jis">Shift-JIS</option>
-    </select>
-
     <label data-i18n="label.lyricsFile">メタタグ付き歌詞テキスト / SRT下書き</label>
-    <input id="lyricsFile" type="file" accept=".txt,.srt,.lrc,.ass,.ssa,text/*">
+    <div class="textFileLoadRow">
+      <input id="lyricsFile" type="file" accept=".txt,.srt,.lrc,.ass,.ssa,text/*">
+      <div class="encodingCompact">
+        <label data-i18n="label.encoding">読込文字コード</label>
+        <select id="encodingSelect">
+          <option value="auto" selected data-i18n="encoding.auto">自動</option>
+          <option value="utf-8">UTF-8</option>
+          <option value="shift_jis">Shift-JIS</option>
+        </select>
+      </div>
+    </div>
 
-    <div class="row">
-      <button id="sampleBtn" data-i18n="button.sample">サンプル</button>
+    <div class="row lyricsExtractRow">
       <button id="extractBtn" class="primary" data-i18n="button.extractLyrics">歌詞行を抽出</button>
-      <button id="clearTextBtn" data-i18n="button.clearText">テキストクリア</button>
-      <button id="clearRowsBtn" data-i18n="button.clearRows">編集画面クリア</button>
-      <button id="clearAllBtn" class="danger" data-i18n="button.clearAll">オールクリア</button>
+      <label class="checkRow inlineCheck advancedOnly">
+        <input id="removeAsciiParenLines" type="checkbox" checked>
+        <span data-i18n="setting.removeAsciiParenLines">半角カッコ半角文字行も削除</span>
+      </label>
+      <button id="clearTextBtn" class="rightAction" data-i18n="button.clearText">テキストクリア</button>
     </div>
 
     <label data-i18n="label.editText">抽出・編集用テキスト</label>
@@ -533,39 +746,51 @@
     <input id="audioFile" type="file" accept=".wav,.mp3,audio/*">
     <audio id="audio" controls></audio>
 
-    <div class="statusGrid">
+    <div class="waveformBox">
+      <div class="waveformHeader">
+        <span data-i18n="label.waveform">周辺波形</span>
+        <span id="waveformStatus" class="waveformStatus" data-i18n="waveform.noAudio">音源未読み込み</span>
+        <label class="checkRow inlineCheck waveformEnableCheck advancedOnly">
+          <input id="waveformEnabled" type="checkbox" checked>
+          <span data-i18n="setting.waveformEnabled">波形表示を有効にする</span>
+        </label>
+      </div>
+      <canvas id="waveformCanvas" class="waveformCanvas" height="81"></canvas>
+    </div>
+
+    <div class="statusGrid compactStatusGrid">
       <div class="card">
         <div class="name" data-i18n="status.currentTime">現在時刻</div>
-        <div class="value" id="currentTime">00:00,000</div>
+        <div class="value" id="currentTime">00:00:00,000</div>
       </div>
       <div class="card">
         <div class="name" data-i18n="status.selectedLine">選択行</div>
         <div class="value" id="currentLine">0 / 0</div>
       </div>
-      <div class="card">
-        <div class="name" data-i18n="status.timingTarget">タイミング中</div>
-        <div class="value" id="activeLine">なし</div>
-      </div>
-      <div class="card">
-        <div class="name" data-i18n="status.timedCount">設定済み</div>
-        <div class="value" id="timedCount">0</div>
-      </div>
     </div>
 
-    <div class="nowLyrics">
-      <div class="lyricBox">
-        <div class="label" data-i18n="lyric.prev">前の行</div>
-        <div id="prevLyric">-</div>
+    <section class="selectedEditor">
+      <div class="sectionTitle" data-i18n="section.selectedEditor">選択行の編集</div>
+      <div class="selectedEditorGrid">
+        <label>
+          <span data-i18n="label.editStart">開始</span>
+          <input id="editStartTime" type="text" placeholder="00:00:00,000">
+        </label>
+        <label>
+          <span data-i18n="label.editEnd">終了</span>
+          <input id="editEndTime" type="text" placeholder="00:00:00,000">
+        </label>
       </div>
-      <div class="lyricBox current">
-        <div class="label" data-i18n="lyric.current">現在行：Rで開始時刻を打つ</div>
-        <div id="nowLyric">-</div>
+      <label class="selectedTextLabel">
+        <span data-i18n="label.editSubtitleText">歌詞</span>
+        <textarea id="editSubtitleText" rows="3" spellcheck="false"></textarea>
+      </label>
+      <div class="row selectedEditorActions">
+        <button id="applySelectedEditBtn" class="primary" data-i18n="button.applySelectedEdit">選択行に反映</button>
+        <button id="reloadSelectedEditBtn" data-i18n="button.reloadSelectedEdit">選択行を再読込</button>
       </div>
-      <div class="lyricBox">
-        <div class="label" data-i18n="lyric.next">次の行</div>
-        <div id="nextLyric">-</div>
-      </div>
-    </div>
+      <div id="selectedEditHint" class="small" data-i18n="hint.selectedEditor">時刻は空欄または --:--,--- で未設定にできます。複数行字幕は \n で表します。</div>
+    </section>
 
     <div class="row">
       <button id="togglePlayBtn" class="primary" data-i18n="button.playStop">Space: 再生/停止</button>
@@ -574,12 +799,12 @@
       <button id="undoBtn" data-i18n="button.undo">Z: 戻す</button>
     </div>
 
-    <label class="checkRow">
+    <label class="checkRow advancedOnly">
       <input id="autoTrimPrevEnd" type="checkbox" checked>
       <span data-i18n="setting.autoTrimPrev">Rで開始時刻をセットしたとき、前行の終了時刻が食い込んでいれば現在行の開始時刻まで詰める</span>
     </label>
 
-    <label class="checkRow">
+    <label class="checkRow advancedOnly">
       <input id="endSelectedLineMode" type="checkbox">
       <span data-i18n="setting.eSelectedMode">Eは「現在選択中の行」の終了時刻を変更し、次の行へ進む（SRT再編集向け）。OFF時は、最後にRでONした行を終了します。</span>
     </label>
@@ -594,18 +819,12 @@
       右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。
     </div>
 
-    <div class="row">
-      <span class="small" data-i18n="setting.monitorInterval">表示中字幕マーク更新周期(ms)</span>
-      <input id="monitorIntervalMs" type="number" value="50" min="20" max="1000" step="10" style="width:90px;">
-      <button id="applyMonitorIntervalBtn" data-i18n="button.apply">適用</button>
-    </div>
 
     <hr class="compactHr">
 
     <label data-i18n="label.outputFile">SRT出力ファイル名</label>
     <div class="filenameRow">
       <input id="outputFileName" type="text" placeholder="output.srt">
-      <button id="previewBtn" data-i18n="button.preview">プレビュー</button>
       <button id="exportBtn" class="primary" data-i18n="button.saveSrt">SRT保存</button>
     </div>
 
@@ -619,19 +838,36 @@
     </div>
 
     <div class="toolbar">
-      <button id="insertRowAboveBtn" data-i18n="button.insertRowAbove">上に行追加</button>
+      <button id="previewBtn" data-i18n="button.preview">プレビュー</button>
+      <button id="insertRowAboveBtn" class="advancedOnly" data-i18n="button.insertRowAbove">上に行追加</button>
       <button id="insertRowBelowBtn" data-i18n="button.insertRowBelow">下に行追加</button>
       <button id="deleteCurrentRowBtn" class="danger" data-i18n="button.deleteCurrentRow">現在行を削除</button>
       <span class="toolbarSep"></span>
-      <button id="clearStartBtn" data-i18n="button.clearStart">開始消去</button>
-      <button id="clearEndBtn" data-i18n="button.clearEnd">終了消去</button>
+      <button id="clearStartBtn" class="advancedOnly" data-i18n="button.clearStart">開始消去</button>
+      <button id="clearEndBtn" class="advancedOnly" data-i18n="button.clearEnd">終了消去</button>
       <button id="clearBothTimesBtn" class="danger" data-i18n="button.clearBothTimes">時刻消去</button>
       <span class="toolbarSep"></span>
       <button id="selectCurrentToEndBtn" data-i18n="button.selectCurrentToEnd">現在行以降を選択</button>
       <button id="clearSelectionBtn" data-i18n="button.clearSelection">選択解除</button>
-      <span class="small" data-i18n="label.bulkShift">選択行を一括シフト：</span>
-      <input id="customShift" type="number" value="0" step="100">
-      <button id="applyCustomShiftBtn" data-i18n="button.apply">適用</button>
+      <span class="bulkShiftControls advancedOnly">
+        <span class="small" data-i18n="label.bulkShift">選択行をシフト：</span>
+        <input id="customShift" type="number" value="0" step="100">
+        <button id="applyCustomShiftBtn" data-i18n="button.apply">適用</button>
+        <span class="tapOffsetInline">
+          <span class="small" data-i18n="setting.tapOffset">タップ入力オフセット</span>
+          <input id="tapOffsetMs" type="number" value="0" step="10" style="width:62px;">
+        </span>
+        <span class="waveformOffsetInline">
+          <span class="small" data-i18n="setting.waveformOffset">波形表示オフセット</span>
+          <input id="waveformOffsetMs" type="number" value="0" step="10" style="width:62px;">
+        </span>
+        <span class="monitorIntervalInline">
+          <span class="small" data-i18n="setting.monitorInterval">プレビュー・字幕位置更新周期</span>
+          <input id="monitorIntervalMs" type="number" value="50" min="20" max="1000" step="10" style="width:62px;">
+          <button id="applyMonitorIntervalBtn" data-i18n="button.apply">適用</button>
+        </span>
+      </span>
+      <button id="clearRowsBtn" data-i18n="button.clearRows">編集画面クリア</button>
     </div>
 
     <div class="tableWrap">
@@ -682,11 +918,14 @@
     ja: {
       "app.subtitle": "メタタグ付き歌詞テキストから歌詞行だけを抽出し、音源を聴きながらキーボードでSRTタイミングを打ち直すローカルツールです。",
       "app.language": "言語",
+      "setting.advancedMode": "上級者モード",
       "section.loadPlaySave": "読み込み・再生・保存",
-      "label.encoding": "文字コード",
+      "label.encoding": "読込文字コード",
+      "encoding.auto": "自動",
       "label.lyricsFile": "メタタグ付き歌詞テキスト / SRT下書き",
       "button.sample": "サンプル",
       "button.extractLyrics": "歌詞行を抽出",
+      "setting.removeAsciiParenLines": "半角カッコ半角文字行も削除",
       "button.clear": "クリア",
       "button.clearText": "テキストクリア",
       "button.clearRows": "編集画面クリア",
@@ -695,6 +934,13 @@
       "button.applyLyrics": "字幕行リストに反映",
       "help.cutTargets": "カット対象：空行、<span class=\"kbd\">[Verse]</span> のような [] 行、SRT番号行、SRT時刻行、WEBVTT行。複数行字幕は <span class=\"kbd\">\\n</span> で指定できます。",
       "label.audioFile": "音源ファイル（WAV推奨。MP4等はダイアログで「すべてのファイル」を選ぶと指定可）",
+      "label.waveform": "周辺波形",
+      "waveform.noAudio": "音源未読み込み",
+      "setting.waveformEnabled": "波形表示を有効にする",
+      "waveform.disabled": "波形表示OFF。ONにするまで音源解析は行いません。",
+      "waveform.loading": "波形解析中...",
+      "waveform.ready": "",
+      "waveform.unavailable": "波形解析不可。再生は可能な場合があります。",
       "status.currentTime": "現在時刻",
       "status.selectedLine": "選択行",
       "status.timingTarget": "タイミング中",
@@ -708,8 +954,10 @@
       "button.undo": "Z: 戻す",
       "setting.autoTrimPrev": "Rで開始時刻をセットしたとき、前行の終了時刻が食い込んでいれば現在行の開始時刻まで詰める",
       "setting.eSelectedMode": "Eは「現在選択中の行」の終了時刻を変更し、次の行へ進む（SRT再編集向け）。OFF時は、最後にRでONした行を終了します。",
+      "setting.tapOffset": "タップ入力オフセット",
+      "setting.waveformOffset": "波形表示オフセット",
       "help.shortcuts": "<span class=\"kbd\">Space</span> 再生/停止　<span class=\"kbd\">R</span> 開始ON・次行へ　<span class=\"kbd\">E</span> 終了OFF（設定によりE対象を切替）<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> 字幕行移動　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> 音源を2秒移動　<span class=\"kbd\">Z</span> 直前操作をアンドゥ<br><span class=\"kbd\">Ins</span> 下に行追加　<span class=\"kbd\">Shift+Ins</span> 上に行追加　<span class=\"kbd\">Del</span> 現在行削除　<span class=\"kbd\">Backspace</span> 時刻消去<br>途中保存では、未設定時刻も <span class=\"kbd\">--:--,---</span> として保存します。<br>右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。",
-      "setting.monitorInterval": "表示中字幕マーク更新周期(ms)",
+      "setting.monitorInterval": "プレビュー・字幕位置更新周期",
       "button.apply": "適用",
       "label.outputFile": "SRT出力ファイル名",
       "button.preview": "プレビュー",
@@ -718,8 +966,15 @@
       "preview.close": "閉じる",
       "preview.restart": "開始位置から再生",
       "preview.hint": "開始・終了の両方があり、終了が開始より後の字幕だけを中央表示します。プレビュー更新周期は表示中字幕マーク更新周期と同じです。閉じると、編集用の音源位置はプレビュー開始前に戻ります。",
+      "section.selectedEditor": "選択行の編集",
+      "label.editStart": "開始",
+      "label.editEnd": "終了",
+      "label.editSubtitleText": "歌詞",
+      "button.applySelectedEdit": "選択行に反映",
+      "button.reloadSelectedEdit": "選択行を再読込",
+      "hint.selectedEditor": "時刻は空欄または --:--,--- で未設定にできます。複数行字幕は \\n で表します。",
       "section.subtitleRows": "字幕行リスト",
-      "section.subtitleRowsHint": "＊列は、音源の現在位置で表示中の字幕を示します。",
+      "section.subtitleRowsHint": "＊列は、音源の現在位置で表示中の字幕を示します。シフト・オフセット等の数値単位はmsです。",
       "button.insertRowAbove": "上に行追加",
       "button.insertRowBelow": "下に行追加",
       "button.deleteCurrentRow": "現在行を削除",
@@ -728,23 +983,25 @@
       "button.clearBothTimes": "時刻消去",
       "button.selectCurrentToEnd": "現在行以降を選択",
       "button.clearSelection": "選択解除",
-      "label.bulkShift": "選択行を任意msシフト：",
+      "label.bulkShift": "選択行をシフト：",
       "table.select": "選",
       "table.start": "開始",
       "table.end": "終了",
       "table.lyrics": "歌詞",
-      "placeholder.lyricsText": "[Verse 1] などのメタタグ付き歌詞をここに貼り付けてもOKです。\n[]だけの行、空行、SRTの番号・時刻行は抽出時に除外します。\n複数行字幕にしたい場合は \\n を入れてください。",
+      "placeholder.lyricsText": "[Verse 1] などのメタタグ付き歌詞をここに貼り付けてもOKです。\n[]だけの行、空行、SRTの番号・時刻行は抽出時に除外します。\n上級者モードでは、(Fade out) のような半角カッコ半角文字行の除外を切り替えられます。\n複数行字幕にしたい場合は \\n を入れてください。",
       "none": "なし",
       "selectedLine": "選択行"
     },
     en: {
       "app.subtitle": "A local browser tool for extracting lyric lines and retiming SRT subtitles while listening to audio.",
       "app.language": "Language",
+      "setting.advancedMode": "Advanced mode",
       "section.loadPlaySave": "Load, Play, Save",
       "label.encoding": "Text encoding",
       "label.lyricsFile": "Tagged lyrics text / SRT draft",
       "button.sample": "Sample",
       "button.extractLyrics": "Extract lyric lines",
+      "setting.removeAsciiParenLines": "Also remove ASCII parenthetical lines",
       "button.clear": "Clear",
       "button.clearText": "Clear text",
       "button.clearRows": "Clear rows",
@@ -753,6 +1010,13 @@
       "button.applyLyrics": "Apply to subtitle rows",
       "help.cutTargets": "Removed lines: blank lines, metadata lines such as <span class=\"kbd\">[Verse]</span>, SRT index lines, SRT timing lines, and WEBVTT lines. Use <span class=\"kbd\">\\n</span> for multi-line subtitles.",
       "label.audioFile": "Audio file (WAV recommended; choose All files in the dialog for MP4 etc.)",
+      "label.waveform": "Local waveform",
+      "waveform.noAudio": "No audio loaded",
+      "setting.waveformEnabled": "Enable waveform display",
+      "waveform.disabled": "Waveform is off. Audio is not decoded until this is enabled.",
+      "waveform.loading": "Analyzing waveform...",
+      "waveform.ready": "",
+      "waveform.unavailable": "Waveform unavailable. Playback may still work.",
       "status.currentTime": "Current time",
       "status.selectedLine": "Selected row",
       "status.timingTarget": "Timing target",
@@ -766,8 +1030,10 @@
       "button.undo": "Z: Undo",
       "setting.autoTrimPrev": "When R sets a start time, trim the previous row end if it overlaps the current start",
       "setting.eSelectedMode": "E edits the end time of the currently selected row and advances to the next row (for SRT re-editing). When OFF, E closes the last row started by R.",
+      "setting.tapOffset": "Tap input offset",
+      "setting.waveformOffset": "Waveform display offset",
       "help.shortcuts": "<span class=\"kbd\">Space</span> Play/Pause　<span class=\"kbd\">R</span> Set start & advance　<span class=\"kbd\">E</span> Set end (target depends on setting)<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> Move row　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> Seek audio by 2 seconds　<span class=\"kbd\">Z</span> Undo last operation<br><span class=\"kbd\">Ins</span> Insert below　<span class=\"kbd\">Shift+Ins</span> Insert above　<span class=\"kbd\">Del</span> Delete current row　<span class=\"kbd\">Backspace</span> Clear time<br>Draft export saves missing times as <span class=\"kbd\">--:--,---</span>.<br>Double-click a subtitle row to seek the audio to that row's start time.",
-      "setting.monitorInterval": "Active subtitle marker update interval (ms)",
+      "setting.monitorInterval": "Preview/subtitle update interval",
       "button.apply": "Apply",
       "label.outputFile": "SRT output filename",
       "button.preview": "Preview",
@@ -776,8 +1042,15 @@
       "preview.close": "Close",
       "preview.restart": "Play from start position",
       "preview.hint": "Only rows with both start and end times, and with end later than start, are shown centered. The preview uses the same update interval as the playback marker. Closing the preview restores the editor audio position.",
+      "section.selectedEditor": "Selected row editor",
+      "label.editStart": "Start",
+      "label.editEnd": "End",
+      "label.editSubtitleText": "Text",
+      "button.applySelectedEdit": "Apply to selected row",
+      "button.reloadSelectedEdit": "Reload selected row",
+      "hint.selectedEditor": "Leave time blank or use --:--,--- for unset. Use \\n for multi-line subtitles.",
       "section.subtitleRows": "Subtitle rows",
-      "section.subtitleRowsHint": "The ＊ column marks subtitle rows active at the current audio position.",
+      "section.subtitleRowsHint": "The ＊ column marks subtitle rows active at the current audio position. Shift/offset/update values are in ms.",
       "button.insertRowAbove": "Insert above",
       "button.insertRowBelow": "Insert below",
       "button.deleteCurrentRow": "Delete current row",
@@ -786,12 +1059,12 @@
       "button.clearBothTimes": "Clear time",
       "button.selectCurrentToEnd": "Select current to end",
       "button.clearSelection": "Clear selection",
-      "label.bulkShift": "Shift selected rows by custom ms:",
+      "label.bulkShift": "Shift rows:",
       "table.select": "Sel",
       "table.start": "Start",
       "table.end": "End",
       "table.lyrics": "Lyrics",
-      "placeholder.lyricsText": "Paste tagged lyrics such as [Verse 1] here.\nBracket-only metadata lines, blank lines, SRT index lines, and SRT timing lines are removed during extraction.\nUse \\n for multi-line subtitles.",
+      "placeholder.lyricsText": "Paste tagged lyrics such as [Verse 1] here.\nBracket-only metadata lines, blank lines, SRT index lines, and SRT timing lines are removed during extraction.\nAdvanced mode can toggle removal of ASCII parenthetical lines such as (Fade out).\nUse \\n for multi-line subtitles.",
       "none": "None",
       "selectedLine": "Selected row"
     }
@@ -820,6 +1093,8 @@
       el.setAttribute("placeholder", tr(el.dataset.i18nPlaceholder));
     });
     updateStatus();
+    if (waveformStatus) waveformStatus.textContent = tr(waveformMessageKey);
+    drawWaveform();
   }
 
   const audio = $("audio");
@@ -833,6 +1108,11 @@
   const linesBody = $("linesBody");
   const logBox = $("log");
   const outputFileName = $("outputFileName");
+  const editStartTime = $("editStartTime");
+  const editEndTime = $("editEndTime");
+  const editSubtitleText = $("editSubtitleText");
+  const waveformCanvas = $("waveformCanvas");
+  const waveformStatus = $("waveformStatus");
 
   let lines = [];
   let currentIndex = 0;
@@ -847,6 +1127,12 @@
   let undoStack = [];
   let monitorTimerId = null;
   let monitorIntervalMs = 50;
+  let waveformPeaks = [];
+  let waveformDuration = 0;
+  let waveformReady = false;
+  let waveformMessageKey = "waveform.noAudio";
+  let currentAudioFile = null;
+  let selectedEditorDirty = false;
 
   outputFileName.addEventListener("input", () => outputNameTouched = true);
 
@@ -907,6 +1193,125 @@
     return `${pad2(h)}:${pad2(m)}:${pad2(s)},${pad3(ms)}`;
   }
 
+  function formatTimeForEditor(seconds) {
+    if (seconds == null || !Number.isFinite(seconds)) return "";
+    return formatSrtTime(seconds);
+  }
+
+  function parseEditorTime(value) {
+    const raw = String(value ?? "").trim();
+    if (!raw || raw === "--:--,---") return null;
+
+    const normalized = raw.replace(/\./g, ",");
+    let m = normalized.match(/^(\d{1,2}):(\d{2}):(\d{2}),(\d{1,3})$/);
+    if (m) {
+      const h = Number(m[1]);
+      const min = Number(m[2]);
+      const sec = Number(m[3]);
+      const ms = Number(m[4].padEnd(3, "0"));
+      if (min >= 60 || sec >= 60) throw new Error(currentLang === "ja" ? "分または秒が60以上です。" : "Minutes or seconds must be less than 60.");
+      return h * 3600 + min * 60 + sec + ms / 1000;
+    }
+
+    m = normalized.match(/^(\d{1,2}):(\d{2}),(\d{1,3})$/);
+    if (m) {
+      const min = Number(m[1]);
+      const sec = Number(m[2]);
+      const ms = Number(m[3].padEnd(3, "0"));
+      if (sec >= 60) throw new Error(currentLang === "ja" ? "秒が60以上です。" : "Seconds must be less than 60.");
+      return min * 60 + sec + ms / 1000;
+    }
+
+    throw new Error(currentLang === "ja"
+      ? `時刻形式が正しくありません: ${raw}`
+      : `Invalid time format: ${raw}`
+    );
+  }
+
+  function isSelectedEditorFocused() {
+    const active = document.activeElement;
+    return active === editStartTime || active === editEndTime || active === editSubtitleText;
+  }
+
+  function loadSelectedRowEditor(force = false) {
+    if (!editStartTime || !editEndTime || !editSubtitleText) return;
+    if (!force && selectedEditorDirty) return;
+
+    const line = lines[currentIndex];
+
+    if (!line) {
+      editStartTime.value = "";
+      editEndTime.value = "";
+      editSubtitleText.value = "";
+      editStartTime.disabled = true;
+      editEndTime.disabled = true;
+      editSubtitleText.disabled = true;
+      $("applySelectedEditBtn").disabled = true;
+      $("reloadSelectedEditBtn").disabled = true;
+      selectedEditorDirty = false;
+      return;
+    }
+
+    editStartTime.disabled = false;
+    editEndTime.disabled = false;
+    editSubtitleText.disabled = false;
+    $("applySelectedEditBtn").disabled = false;
+    $("reloadSelectedEditBtn").disabled = false;
+
+    editStartTime.value = formatTimeForEditor(line.start);
+    editEndTime.value = formatTimeForEditor(line.end);
+    editSubtitleText.value = line.text || "";
+    selectedEditorDirty = false;
+  }
+
+  function markSelectedEditorDirty() {
+    selectedEditorDirty = true;
+  }
+
+  function applySelectedRowEditor() {
+    const line = lines[currentIndex];
+    if (!line) return;
+
+    let start;
+    let end;
+
+    try {
+      start = parseEditorTime(editStartTime.value);
+      end = parseEditorTime(editEndTime.value);
+    } catch (e) {
+      log(currentLang === "ja"
+        ? `選択行の時刻を反映できません: ${e.message}`
+        : `Could not apply selected-row time: ${e.message}`
+      );
+      return;
+    }
+
+    if (start != null && end != null && end <= start) {
+      const ok = confirm(currentLang === "ja"
+        ? "終了時刻が開始時刻以下です。このまま反映しますか？"
+        : "The end time is not later than the start time. Apply anyway?"
+      );
+      if (!ok) return;
+    }
+
+    pushUndo();
+
+    line.start = start;
+    line.end = end;
+    line.text = encodeLineBreaksForCell(editSubtitleText.value).trim();
+
+    selectedEditorDirty = false;
+    render();
+    loadSelectedRowEditor(true);
+    scrollCurrentIntoView();
+    log(currentLang === "ja"
+      ? `選択行 ${currentIndex + 1} を更新しました。`
+      : `Updated selected row ${currentIndex + 1}.`
+    );
+    focusApp();
+  }
+
+
 
   function parseSrtTime(str) {
     const m = String(str).match(/(?:(\d{1,2}):)?(\d{1,2}):(\d{2})[,.](\d{1,3})/);
@@ -954,47 +1359,309 @@
     return tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT" || ev.target.isContentEditable;
   }
 
-  async function readFileAsText(file, encoding) {
-    const buf = await file.arrayBuffer();
-    const decoder = new TextDecoder(encoding || "utf-8");
-    return decoder.decode(buf);
+  function decodeUtf8Strict(bytes) {
+    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   }
 
+  function decodeTextWithAuto(bytes, encoding) {
+    const requested = encoding || "auto";
+
+    if (requested === "utf-8") {
+      return { text: new TextDecoder("utf-8").decode(bytes), encoding: "UTF-8" };
+    }
+
+    if (requested === "shift_jis") {
+      return { text: new TextDecoder("shift_jis").decode(bytes), encoding: "Shift-JIS" };
+    }
+
+    // Auto mode: BOM first, then strict UTF-8, then Shift-JIS fallback.
+    if (bytes.length >= 3 && bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) {
+      return { text: new TextDecoder("utf-8").decode(bytes), encoding: "UTF-8 BOM" };
+    }
+
+    try {
+      return { text: decodeUtf8Strict(bytes), encoding: "UTF-8" };
+    } catch (e) {
+      return { text: new TextDecoder("shift_jis").decode(bytes), encoding: "Shift-JIS" };
+    }
+  }
+
+  async function readFileAsText(file, encoding) {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    return decodeTextWithAuto(bytes, encoding || "auto");
+  }
+
+  function isAsciiParentheticalMetadataLine(text) {
+    const t = String(text ?? "").trim();
+    return /^\([ -~]+\)$/.test(t);
+  }
+
+  function getTapInputOffsetSeconds() {
+    const input = $("tapOffsetMs");
+    if (!input) return 0;
+    const ms = Number(input.value);
+    if (!Number.isFinite(ms)) return 0;
+    return ms / 1000;
+  }
+
+  function getWaveformDisplayOffsetSeconds() {
+    const input = $("waveformOffsetMs");
+    if (!input) return 0;
+    const ms = Number(input.value);
+    if (!Number.isFinite(ms)) return 0;
+    return ms / 1000;
+  }
+
+  function getTapAdjustedTime() {
+    const raw = (audio.currentTime || 0) + getTapInputOffsetSeconds();
+    const duration = audio && Number.isFinite(audio.duration) ? audio.duration : null;
+    if (duration != null) return Math.max(0, Math.min(duration, raw));
+    return Math.max(0, raw);
+  }
+
+  function applyAdvancedMode() {
+    const checkbox = $("advancedMode");
+    const enabled = !!checkbox?.checked;
+    document.querySelectorAll(".advancedOnly").forEach(el => {
+      el.classList.toggle("is-hidden", !enabled);
+    });
+    try {
+      localStorage.setItem("srtTapTimerAdvancedMode", enabled ? "1" : "0");
+    } catch (e) {
+      // Ignore storage failures.
+    }
+    drawWaveform();
+  }
+
+  function setWaveformStatus(key) {
+    waveformMessageKey = key || "waveform.noAudio";
+    if (waveformStatus) waveformStatus.textContent = tr(waveformMessageKey);
+  }
+
+  function resetWaveform(key = "waveform.noAudio") {
+    waveformPeaks = [];
+    waveformDuration = 0;
+    waveformReady = false;
+    setWaveformStatus(key);
+    drawWaveform();
+  }
+
+  function isWaveformEnabled() {
+    const checkbox = $("waveformEnabled");
+    return !checkbox || checkbox.checked;
+  }
+
+  function drawWaveform() {
+    if (!waveformCanvas) return;
+
+    const rect = waveformCanvas.getBoundingClientRect();
+    const cssWidth = Math.max(1, Math.floor(rect.width || 1));
+    const cssHeight = Math.max(1, Math.floor(rect.height || 62));
+    const dpr = window.devicePixelRatio || 1;
+    const targetWidth = Math.floor(cssWidth * dpr);
+    const targetHeight = Math.floor(cssHeight * dpr);
+
+    if (waveformCanvas.width !== targetWidth || waveformCanvas.height !== targetHeight) {
+      waveformCanvas.width = targetWidth;
+      waveformCanvas.height = targetHeight;
+    }
+
+    const ctx = waveformCanvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    ctx.fillStyle = "#0c0f14";
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+    const mid = cssHeight / 2;
+    const nowX = Math.round(cssWidth * 0.2);
+    const pastSeconds = 2;
+    const futureSeconds = 8;
+    const windowSeconds = pastSeconds + futureSeconds;
+    const now = Math.max(0, (audio.currentTime || 0) + getWaveformDisplayOffsetSeconds());
+    const viewStart = now - pastSeconds;
+
+    // Center horizontal line.
+    ctx.strokeStyle = "#2c3442";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, mid);
+    ctx.lineTo(cssWidth, mid);
+    ctx.stroke();
+
+    // Future side subtle tint. The fixed current-position line is at 20%.
+    ctx.fillStyle = "rgba(255, 207, 112, 0.06)";
+    ctx.fillRect(nowX, 0, cssWidth - nowX, cssHeight);
+
+    if (waveformReady && waveformPeaks.length && waveformDuration > 0 && isWaveformEnabled()) {
+      ctx.strokeStyle = "#7fb3ff";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+
+      const pointCount = waveformPeaks.length;
+
+      for (let x = 0; x < cssWidth; x++) {
+        const seconds = viewStart + (x / Math.max(1, cssWidth - 1)) * windowSeconds;
+        if (seconds < 0 || seconds > waveformDuration) continue;
+
+        const idx = Math.max(0, Math.min(pointCount - 1, Math.floor((seconds / waveformDuration) * pointCount)));
+        const amp = Math.max(0, Math.min(1, waveformPeaks[idx] || 0));
+        const y = Math.max(1, Math.min(mid - 2, amp * (mid - 4) * 1.3));
+
+        ctx.moveTo(x + 0.5, mid - y);
+        ctx.lineTo(x + 0.5, mid + y);
+      }
+      ctx.stroke();
+
+      // Boundary ticks: -2s, now, +8s
+      ctx.fillStyle = "#6f7889";
+      ctx.font = "10px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+      ctx.fillText("-2s", 4, cssHeight - 5);
+      ctx.fillText("+8s", Math.max(4, cssWidth - 26), cssHeight - 5);
+    } else {
+      ctx.fillStyle = "#6f7889";
+      ctx.font = "11px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+      const label = tr(isWaveformEnabled() ? waveformMessageKey : "waveform.disabled");
+      ctx.fillText(label, 10, Math.round(mid + 4));
+    }
+
+    // Fixed current-position line.
+    ctx.save();
+    ctx.globalCompositeOperation = "difference";
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(nowX, 0);
+    ctx.lineTo(nowX, cssHeight);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  async function buildWaveform(file) {
+    if (!file) {
+      resetWaveform("waveform.noAudio");
+      return;
+    }
+
+    if (!isWaveformEnabled()) {
+      resetWaveform("waveform.disabled");
+      return;
+    }
+
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) {
+      resetWaveform("waveform.unavailable");
+      return;
+    }
+
+    resetWaveform("waveform.loading");
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const ctx = new AudioCtx();
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
+      if (ctx.close) {
+        try { await ctx.close(); } catch (e) {}
+      }
+
+      const length = audioBuffer.length;
+      const duration = audioBuffer.duration || 0;
+      const channels = audioBuffer.numberOfChannels;
+      const bucketCount = Math.max(800, Math.min(30000, Math.ceil(duration / 0.02) || 800));
+      const step = Math.max(1, Math.floor(length / bucketCount));
+      const peaks = new Array(bucketCount).fill(0);
+      let globalMax = 0;
+
+      for (let i = 0; i < bucketCount; i++) {
+        const start = i * step;
+        const end = i === bucketCount - 1 ? length : Math.min(length, start + step);
+        const stride = Math.max(1, Math.floor((end - start) / 60));
+        let max = 0;
+
+        for (let ch = 0; ch < channels; ch++) {
+          const data = audioBuffer.getChannelData(ch);
+          for (let j = start; j < end; j += stride) {
+            const v = Math.abs(data[j] || 0);
+            if (v > max) max = v;
+          }
+        }
+
+        peaks[i] = max;
+        if (max > globalMax) globalMax = max;
+      }
+
+      waveformPeaks = globalMax > 0 ? peaks.map(v => v / globalMax) : peaks;
+      waveformDuration = duration;
+      waveformReady = true;
+      setWaveformStatus("waveform.ready");
+      drawWaveform();
+    } catch (e) {
+      waveformPeaks = [];
+      waveformDuration = 0;
+      waveformReady = false;
+      setWaveformStatus("waveform.unavailable");
+      drawWaveform();
+      log(currentLang === "ja"
+        ? "周辺波形を解析できませんでした。音源自体は再生できる場合があります。"
+        : "Could not analyze the local waveform. The media may still be playable."
+      );
+    }
+  }
 
   function parseSrt(raw) {
     const text = raw
       .replace(/^\uFEFF/, "")
       .replace(/\r\n/g, "\n")
-      .replace(/\r/g, "\n")
-      .trim();
+      .replace(/\r/g, "\n");
 
-    if (!text) return [];
+    if (!text.trim()) return [];
 
-    const blocks = text.split(/\n{2,}/);
+    const rows = text.split("\n");
     const parsed = [];
+    const timeLineRe = /^\s*(--:--,---|\d{1,2}:\d{2}(?::\d{2})?[\.,]\d{1,3})\s*-->\s*(--:--,---|\d{1,2}:\d{2}(?::\d{2})?[\.,]\d{1,3})(?:\s+.*)?$/;
 
-    for (const block of blocks) {
-      const rows = block.split("\n").map(s => s.trimEnd()).filter(s => s.trim() !== "");
-      if (!rows.length) continue;
+    let i = 0;
+    while (i < rows.length) {
+      const m = rows[i].trim().match(timeLineRe);
+      if (!m) {
+        i++;
+        continue;
+      }
 
-      const timeIndex = rows.findIndex(r => /-->\s*/.test(r));
-      if (timeIndex < 0) continue;
+      const start = parseNullableSrtTime(m[1]);
+      const end = parseNullableSrtTime(m[2]);
 
-      const timeLine = rows[timeIndex];
-      const parts = timeLine.split(/-->/);
-      if (parts.length < 2) continue;
+      if (start === undefined || end === undefined) {
+        i++;
+        continue;
+      }
 
-      const start = parseNullableSrtTime(parts[0]);
-      const end = parseNullableSrtTime(parts.slice(1).join("-->"));
+      const textRows = [];
+      i++;
 
-      // Unknown malformed time strings are skipped, but the app's own missing-time marker is accepted.
-      if (start === undefined || end === undefined) continue;
+      while (i < rows.length) {
+        const rawTextLine = rows[i];
+        const trimmed = rawTextLine.trim();
 
-      const textRows = rows.slice(timeIndex + 1);
-      const lyric = encodeLineBreaksForCell(textRows.join("\n")).trim();
+        if (!trimmed) {
+          i++;
+          break;
+        }
+
+        // Support SRT files that omit blank separators.
+        if (/^\d+$/.test(trimmed) && i + 1 < rows.length && timeLineRe.test(rows[i + 1].trim())) {
+          break;
+        }
+        if (timeLineRe.test(trimmed)) {
+          break;
+        }
+
+        textRows.push(rawTextLine);
+        i++;
+      }
 
       parsed.push({
-        text: lyric,
+        text: encodeLineBreaksForCell(textRows.join("\n")).trim(),
         start,
         end,
         selected: false
@@ -1004,15 +1671,18 @@
     return parsed;
   }
 
+
   function extractLyrics(raw) {
     const out = [];
     const rawLines = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+    const removeAsciiParen = $("removeAsciiParenLines")?.checked ?? true;
 
     for (let line of rawLines) {
       let t = line.trim();
 
       if (!t) continue;
       if (/^\[.*\]$/.test(t)) continue;
+      if (removeAsciiParen && isAsciiParentheticalMetadataLine(t)) continue;
       if (/^\d+$/.test(t)) continue;
       if (/-->\s*/.test(t)) continue;
       if (/^WEBVTT\b/i.test(t)) continue;
@@ -1063,7 +1733,9 @@
 
   function setCurrentIndex(i) {
     currentIndex = clampIndex(i);
+    selectedEditorDirty = false;
     render();
+    loadSelectedRowEditor(true);
     scrollCurrentIntoView();
     focusApp();
   }
@@ -1080,10 +1752,37 @@
     updateStatus();
   }
 
-  function scrollCurrentIntoView() {
+  function scrollCurrentIntoView(mode = "nearest") {
     requestAnimationFrame(() => {
       const row = document.querySelector(`tr[data-i="${currentIndex}"]`);
-      if (row) row.scrollIntoView({ block: "nearest" });
+      if (!row) return;
+
+      if (mode !== "comfortable") {
+        row.scrollIntoView({ block: "nearest" });
+        return;
+      }
+
+      const wrap = row.closest(".tableWrap");
+      if (!wrap) {
+        row.scrollIntoView({ block: "nearest" });
+        return;
+      }
+
+      const wrapHeight = wrap.clientHeight;
+      if (!wrapHeight) return;
+
+      const wrapRect = wrap.getBoundingClientRect();
+      const rowRect = row.getBoundingClientRect();
+      const rowTop = rowRect.top - wrapRect.top;
+      const rowBottom = rowRect.bottom - wrapRect.top;
+      const lowerTrigger = wrapHeight * 0.70;
+      const targetTop = wrapHeight * 0.35;
+
+      if (rowBottom > lowerTrigger) {
+        wrap.scrollTop += rowTop - targetTop;
+      } else if (rowTop < 0) {
+        row.scrollIntoView({ block: "nearest" });
+      }
     });
   }
 
@@ -1115,7 +1814,7 @@
     }
 
     pushUndo();
-    const t = audio.currentTime;
+    const t = getTapAdjustedTime();
     const i = currentIndex;
 
     // 通常の新規タップでは、前回Rで開始した行を次のR時刻で閉じる。
@@ -1165,7 +1864,7 @@
     }
 
     render();
-    scrollCurrentIntoView();
+    scrollCurrentIntoView("comfortable");
 
     const extra = [];
     if (closedActive) {
@@ -1197,7 +1896,7 @@
     }
 
     pushUndo();
-    const t = audio.currentTime;
+    const t = getTapAdjustedTime();
     lines[targetIndex].end = t;
     const ended = targetIndex;
 
@@ -1215,7 +1914,7 @@
     }
 
     render();
-    scrollCurrentIntoView();
+    scrollCurrentIntoView("comfortable");
     const nextMsg = selectedMode && ended < lines.length - 1 ? " 次の行へ進みました。" : "";
     log(`E: ${ended + 1}行目の終了 ${formatSrtTime(t)} を設定しました。${nextMsg}`);
     focusApp();
@@ -1376,6 +2075,8 @@
 
   function clearRows() {
     if (!lines.length) {
+      selectedEditorDirty = false;
+      loadSelectedRowEditor(true);
       log(currentLang === "ja" ? "編集画面はすでに空です。" : "Subtitle rows are already empty.");
       return;
     }
@@ -1383,7 +2084,9 @@
     lines = [];
     currentIndex = 0;
     activeIndex = null;
+    selectedEditorDirty = false;
     render();
+    loadSelectedRowEditor(true);
     log(currentLang === "ja" ? "編集画面をクリアしました。" : "Subtitle rows cleared.");
     focusApp();
   }
@@ -1393,6 +2096,7 @@
     lines = [];
     currentIndex = 0;
     activeIndex = null;
+    selectedEditorDirty = false;
 
     lyricsText.value = "";
     lyricsFile.value = "";
@@ -1403,10 +2107,13 @@
     }
     audio.removeAttribute("src");
     audio.load();
+    currentAudioFile = null;
+    resetWaveform(isWaveformEnabled() ? "waveform.noAudio" : "waveform.disabled");
 
     outputNameTouched = false;
     setDefaultOutputName("subtitles");
     render();
+    loadSelectedRowEditor(true);
     log(currentLang === "ja" ? "すべてクリアしました。" : "All cleared.");
     focusApp();
   }
@@ -1872,15 +2579,13 @@
   function updateStatus() {
     $("currentTime").textContent = formatSrtTime(audio.currentTime || 0);
     $("currentLine").textContent = lines.length ? `${currentIndex + 1} / ${lines.length}` : "0 / 0";
-    const selectedMode = $("endSelectedLineMode")?.checked;
-    $("activeLine").textContent = selectedMode ? tr("selectedLine") : (activeIndex == null ? tr("none") : `${activeIndex + 1}`);
-    $("timedCount").textContent = String(lines.filter(l => l.start != null).length);
 
-    $("prevLyric").textContent = lines[currentIndex - 1]?.text || "-";
-    $("nowLyric").textContent = lines[currentIndex]?.text || "-";
-    $("nextLyric").textContent = lines[currentIndex + 1]?.text || "-";
+    if (!isSelectedEditorFocused()) {
+      loadSelectedRowEditor(false);
+    }
 
     updatePlaybackMarker();
+    drawWaveform();
   }
 
   function setupMonitorTimer() {
@@ -1938,21 +2643,30 @@
     activeIndex = null;
   }
 
+  lyricsFile.addEventListener("click", () => {
+    lyricsFile.value = "";
+  });
+
   lyricsFile.addEventListener("change", async () => {
     const file = lyricsFile.files[0];
     if (!file) return;
     setDefaultOutputName(file.name);
+
     try {
-      const text = await readFileAsText(file, encodingSelect.value);
-      lyricsText.value = text;
+      const decoded = await readFileAsText(file, encodingSelect.value);
+      const text = decoded.text;
+      const detectedEncoding = decoded.encoding;
 
       const isSrt = /\.srt$/i.test(file.name) || /-->\s*/.test(text);
       if (isSrt) {
         const parsed = parseSrt(text);
         if (parsed.length > 0) {
-          pushUndo();
           lines = parsed;
           currentIndex = 0;
+          activeIndex = null;
+          lines.forEach(line => line.selected = false);
+          undoStack = [];
+          selectedEditorDirty = false;
 
           const completeTimestampSrt = isCompleteTimestampSrt(parsed);
           setEndSelectedMode(completeTimestampSrt);
@@ -1960,6 +2674,7 @@
           lyricsText.value = parsed.map(l => l.text).join("\n");
           const autoAdjusted = enforceMonitorIntervalForLargeRows();
           render();
+          loadSelectedRowEditor(true);
           scrollCurrentIntoView();
 
           const modeMsg = completeTimestampSrt
@@ -1971,51 +2686,78 @@
                 : " Some timestamps are missing, so E re-edit mode was turned off.");
 
           log(currentLang === "ja"
-            ? `SRTとして読み込みました: ${file.name} / ${parsed.length}行${autoAdjusted ? monitorAutoAdjustMessage() : ""}${modeMsg}`
-            : `Loaded as SRT: ${file.name} / ${parsed.length} rows${autoAdjusted ? monitorAutoAdjustMessage() : ""}${modeMsg}`
+            ? `SRTとして読み込みました: ${file.name} / ${parsed.length}行 / ${detectedEncoding}${autoAdjusted ? monitorAutoAdjustMessage() : ""}${modeMsg}`
+            : `Loaded as SRT: ${file.name} / ${parsed.length} rows / ${detectedEncoding}${autoAdjusted ? monitorAutoAdjustMessage() : ""}${modeMsg}`
           );
         } else {
+          lyricsText.value = text;
+          lines = [];
+          currentIndex = 0;
+          activeIndex = null;
+          lines.forEach(line => line.selected = false);
+          undoStack = [];
+          selectedEditorDirty = false;
           setEndSelectedMode(false);
           render();
+          loadSelectedRowEditor(true);
           log(currentLang === "ja"
-            ? `SRTとして読み込もうとしましたが、字幕ブロックを解析できませんでした: ${file.name} E再編集モードはOFFにしました。`
-            : `Tried to load as SRT, but no subtitle blocks could be parsed: ${file.name}. E re-edit mode was turned off.`
+            ? `SRTとして読み込もうとしましたが、字幕ブロックを解析できませんでした: ${file.name} / ${detectedEncoding} E再編集モードはOFFにしました。`
+            : `Tried to load as SRT, but no subtitle blocks could be parsed: ${file.name} / ${detectedEncoding}. E re-edit mode was turned off.`
           );
         }
       } else {
+        lyricsText.value = text;
+        lines = [];
+        currentIndex = 0;
+        activeIndex = null;
+        lines.forEach(line => line.selected = false);
+        undoStack = [];
+        selectedEditorDirty = false;
         setEndSelectedMode(false);
         render();
+        loadSelectedRowEditor(true);
         log(currentLang === "ja"
-          ? `読み込みました: ${file.name} E再編集モードはOFFにしました。`
-          : `Loaded: ${file.name}. E re-edit mode was turned off.`
+          ? `読み込みました: ${file.name} / ${detectedEncoding} E再編集モードはOFFにしました。`
+          : `Loaded: ${file.name} / ${detectedEncoding}. E re-edit mode was turned off.`
         );
       }
     } catch (e) {
-      log(`歌詞ファイルの読み込みに失敗しました: ${e.message}`);
+      log(currentLang === "ja"
+        ? `歌詞/SRTファイルの読み込みに失敗しました: ${e.message}`
+        : `Failed to load lyric/SRT file: ${e.message}`
+      );
     }
+
     focusApp();
   });
+
+
 
   audioFile.addEventListener("change", () => {
     const file = audioFile.files[0];
     if (!file) return;
+    currentAudioFile = file;
     if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
     audioObjectUrl = URL.createObjectURL(file);
     audio.src = audioObjectUrl;
+    if (isWaveformEnabled()) {
+      resetWaveform("waveform.loading");
+      buildWaveform(file);
+    } else {
+      resetWaveform("waveform.disabled");
+    }
     if (!lyricsFile.files[0]) setDefaultOutputName(file.name);
-    log(`音源を読み込みました: ${file.name}`);
-    focusApp();
-  });
-
-  $("sampleBtn").addEventListener("click", () => {
-    lyricsText.value = `[Intro]\n\n[Verse 1]\n雨上がりの道を\nきみの声が抜けていく\n\n[Chorus]\nもう一度だけ\n合図を待っていた\n`;
+    log(currentLang === "ja" ? `音源を読み込みました: ${file.name}` : `Loaded media: ${file.name}`);
     focusApp();
   });
 
   $("extractBtn").addEventListener("click", () => {
     const extracted = extractLyrics(lyricsText.value);
     lyricsText.value = extracted.join("\n");
-    log(`${extracted.length}行を抽出しました。必要なら編集してから反映してください。`);
+    log(currentLang === "ja"
+      ? `${extracted.length}行を抽出しました。必要なら編集してから反映してください。`
+      : `Extracted ${extracted.length} lyric lines. Edit them if needed, then apply to subtitle rows.`
+    );
     focusApp();
   });
 
@@ -2048,7 +2790,40 @@
   $("selectCurrentToEndBtn").addEventListener("click", selectCurrentToEnd);
   $("clearSelectionBtn").addEventListener("click", clearSelection);
   $("applyCustomShiftBtn").addEventListener("click", () => shiftSelected($("customShift").value));
+  editStartTime.addEventListener("input", markSelectedEditorDirty);
+  editEndTime.addEventListener("input", markSelectedEditorDirty);
+  editSubtitleText.addEventListener("input", markSelectedEditorDirty);
+  $("applySelectedEditBtn").addEventListener("click", applySelectedRowEditor);
+  $("reloadSelectedEditBtn").addEventListener("click", () => {
+    selectedEditorDirty = false;
+    loadSelectedRowEditor(true);
+    focusApp();
+  });
+
   $("applyMonitorIntervalBtn").addEventListener("click", applyMonitorInterval);
+  $("waveformOffsetMs").addEventListener("input", () => {
+    drawWaveform();
+  });
+
+  $("waveformEnabled").addEventListener("change", () => {
+    const enabled = isWaveformEnabled();
+    try {
+      localStorage.setItem("srtTapTimerWaveformEnabled", enabled ? "1" : "0");
+    } catch (e) {
+      // Ignore storage failures.
+    }
+
+    if (!enabled) {
+      resetWaveform("waveform.disabled");
+    } else if (currentAudioFile) {
+      buildWaveform(currentAudioFile);
+    } else {
+      resetWaveform(audio.src ? "waveform.unavailable" : "waveform.noAudio");
+    }
+
+    focusApp();
+  });
+  $("advancedMode").addEventListener("change", applyAdvancedMode);
   $("languageSelect").addEventListener("change", (ev) => applyLanguage(ev.target.value));
   $("endSelectedLineMode").addEventListener("change", () => {
     activeIndex = null;
@@ -2134,15 +2909,25 @@
 
   audio.addEventListener("timeupdate", updateStatus);
   audio.addEventListener("loadedmetadata", updateStatus);
+  audio.addEventListener("seeked", updateStatus);
+  window.addEventListener("resize", drawWaveform);
   audio.addEventListener("play", focusApp);
   audio.addEventListener("pause", focusApp);
   setupMonitorTimer();
 
   const savedLang = localStorage.getItem("srtTapTimerLang");
   const browserLang = (navigator.language || "").toLowerCase().startsWith("ja") ? "ja" : "en";
+  const savedAdvancedMode = localStorage.getItem("srtTapTimerAdvancedMode") === "1";
+  const savedWaveformEnabled = localStorage.getItem("srtTapTimerWaveformEnabled");
+  $("advancedMode").checked = savedAdvancedMode;
+  if (savedWaveformEnabled !== null) {
+    $("waveformEnabled").checked = savedWaveformEnabled !== "0";
+  }
   applyLanguage(savedLang || browserLang);
+  applyAdvancedMode();
 
   setDefaultOutputName("subtitles");
+  resetWaveform(isWaveformEnabled() ? "waveform.noAudio" : "waveform.disabled");
   render();
 })();
 </script>
