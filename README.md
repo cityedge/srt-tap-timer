@@ -1,47 +1,16 @@
-# SRT Tap Timer
+# SRT Tap Timer v1.53 experimental
 
-SRT Tap Timer is a browser-based SRT subtitle timing editor for lyric subtitles.
+SRT Tap Timer is a single-file local HTML app for creating and editing SRT subtitle timings while listening to audio.
 
-音源を再生しながら、キーボード操作で歌詞字幕の開始・終了タイミングを作成・修正するためのHTML単体アプリです。音源・歌詞・SRTファイルはブラウザ内でローカルに処理され、サーバーへアップロードされません。
+This experimental version is based on v1.51 experimental. v1.52's recording-capture change is not included. v1.53 adds a confirmation dialog before starting WebM video creation, warning the user to keep the browser tab in the foreground until recording finishes.
 
-## Use the app
+## Files
 
-Open `index.html` on GitHub Pages, or download the standalone package from Releases and open the HTML file locally.
+- `index.html` — app entry point
+- `USER_GUIDE.md` — brief usage notes
+- `CHANGELOG.md` — change history
+- `LICENSE` — MIT License
 
-## Documentation
+## Target environment
 
-- [Full User Guide / フル操作マニュアル](USER_GUIDE.md)
-- [Changelog / 更新履歴](CHANGELOG.md)
-- [License](LICENSE)
-
-## Current version
-
-v1.44
-
-## Main features
-
-- Create SRT timing from plain lyric text.
-- Re-time existing SRT files.
-- Tap subtitle start timing with `R`.
-- Set end timing with `E`.
-- Keep upcoming lyric rows visible with comfortable auto-scroll during real-time R/E tap input.
-- Support both beginner mode and advanced mode.
-- Show a local waveform around the current playback position.
-- Apply a tap input offset to `R` / `E` timing.
-- Auto-detect UTF-8 / Shift-JIS text encoding when loading lyric or SRT files.
-- Adjust waveform display timing independently from tap input timing.
-- Edit the selected row directly from the left-pane inspector.
-- Optionally remove ASCII parenthetical metadata lines such as `(Fade out)` during lyric extraction.
-- Save incomplete draft SRT files using `--:--,---`.
-- Reload draft SRT files and continue editing.
-- Preview completed subtitles in a modal preview screen.
-
-## Privacy
-
-This tool runs entirely in the browser. Audio, lyrics, and SRT files are read locally by the browser. The app does not upload these files to any server.
-
-## License
-
-This project is licensed under the MIT License.
-
-Copyright (c) 2026 cityedge
+Windows + Chrome / Edge is the primary target for the integrated WebM video creation feature.
