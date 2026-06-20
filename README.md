@@ -1,58 +1,52 @@
 # SRT Tap Timer v1.55
 
-SRT Tap Timer is a local, single-file HTML tool for creating and editing SRT subtitles while listening to audio. It is designed primarily for Japanese song subtitles, especially Suno-style music production workflows where timing must be adjusted by ear.
+SRT Tap Timer is a local browser-based tool for creating and editing SRT subtitle timing while listening to audio. It is designed especially for lyric subtitles, AI-generated SRT correction, and simple subtitle video creation.
 
-The app runs in the browser. It does not require a server, and the subtitle/audio/image files are processed locally in the browser.
+SRT Tap Timer は、音源を聴きながら `R` / `E` キーで歌詞字幕の開始・終了タイミングを作成・修正できる、ローカル動作のブラウザ用SRT字幕エディターです。v1.55では、SRT編集に加えて、静止画・音源・完成字幕行から簡易字幕付きWebM動画を作成できます。
 
 ## Main features
 
-- Extract lyric lines from a metatagged lyrics text file, or load an existing SRT draft.
-- Tap subtitle timing while listening to audio.
-- Use `R` to set the current row start time and move forward.
-- Use `E` to set an end time.
-- Use `Space` to play/pause audio.
-- Use `Z` to undo timing and edit operations.
-- Edit selected row start/end/text directly.
-- Add, delete, clear, select, and bulk-shift subtitle rows.
-- Display a nearby waveform around the current playback position.
-- Export an SRT file.
-- Preview subtitles in the integrated video-export window.
-- Create a still-image + audio + subtitle WebM video in the browser.
-- Create either horizontal 16:9 video or vertical 9:16 short video.
-- Adjust subtitle height, font size, outline, black band, and image fitting.
-- Japanese / English UI switching.
+- Extract lyric lines from text with metadata tags.
+- Load and re-edit existing SRT files.
+- Tap subtitle timing with keyboard shortcuts.
+- Save incomplete work using `--:--,---` draft timestamps.
+- Reload draft SRT files and continue editing.
+- Display a local waveform preview around the current audio position.
+- Directly edit the selected row's start, end, and subtitle text.
+- Preview and create a simple subtitle WebM video.
+- Export landscape video (16:9 / 1280×720) or short vertical video (9:16 / 720×1280).
+- Convert generated WebM files to MP4 with the included ffmpeg BAT.
+- Convert MP3 audio to WAV with the included ffmpeg BAT.
 
-## Included files
+## Files
 
-- `index.html` — SRT Tap Timer v1.55 application.
-- `README.md` — this overview.
-- `USER_GUIDE.md` — detailed usage guide in Japanese.
+- `index.html` — SRT Tap Timer app.
+- `USER_GUIDE.md` — full user guide and detailed operation manual.
 - `CHANGELOG.md` — version history.
 - `LICENSE` — MIT License.
-- `convert_webm_to_mp4.bat` — Windows helper script to convert exported WebM files to MP4 with ffmpeg.
-- `convert_mp3_to_wav.bat` — Windows helper script to convert MP3 files to WAV with ffmpeg.
+- `convert_webm_to_mp4.bat` — drag-and-drop WebM to MP4 converter. Requires ffmpeg in PATH.
+- `convert_mp3_to_wav.bat` — drag-and-drop MP3 to WAV converter. Requires ffmpeg in PATH.
 
-## Target environment
+## Recommended environment
 
-The primary target is Windows + Chrome / Edge.
+Use the latest Google Chrome or Microsoft Edge on Windows.
 
-The integrated video export uses browser APIs such as Canvas, Web Audio, `captureStream()`, and `MediaRecorder`. Chrome / Edge on desktop is the recommended environment. Mobile browsers and Safari are not primary targets.
+The SRT editor runs locally in the browser. The video export feature depends on browser APIs such as Canvas, MediaRecorder, and audio `captureStream`, so Chrome or Edge is recommended.
 
-## Important recording note
+## Important video export note
 
-When creating a WebM video, keep the SRT Tap Timer tab in the foreground until recording finishes. If the tab is moved to the background during recording, the browser may throttle Canvas drawing and the created WebM may have audio and image but no subtitles.
+During WebM creation, keep the browser tab in the foreground. If you switch tabs while recording, the browser may throttle canvas rendering. The output WebM may still be created with audio, but subtitles may be missing.
 
-v1.55 shows a confirmation dialog before video creation to warn about this.
+## Privacy
 
-## Helper BAT files
+Files are processed locally in the browser. The app itself does not upload audio, lyrics, SRT, images, or generated videos to a server.
 
-The included BAT files assume that `ffmpeg` is installed and available in `PATH`.
+## GitHub Pages
 
-- Drop one or more WebM files onto `convert_webm_to_mp4.bat` to create MP4 files for platforms such as TikTok and Instagram.
-- Drop one or more MP3 files onto `convert_mp3_to_wav.bat` to create WAV files.
-
-The helper scripts do not overwrite existing output files. If an output file with the same name already exists, conversion stops with an error.
+This repository can be published with GitHub Pages by serving `index.html` from the repository root.
 
 ## License
 
-MIT License. See `LICENSE`.
+MIT License.
+
+Copyright (c) 2026 cityedge

@@ -599,7 +599,7 @@
     }
   }
 
-  /* Video preview placeholder subtitle removed. */
+  /* v1.51 experimental: removed video preview placeholder subtitle. */
   .sttvVideoExportModal {
     position: fixed;
     inset: 0;
@@ -1013,7 +1013,7 @@
     </div>
 
     <div class="toolbar">
-      <button id="previewBtn" data-i18n="button.previewVideoExport">プレビュー / 動画作成</button>
+      <button id="previewBtn" data-i18n="button.previewVideoExport">プレビュー / 動画作成β</button>
       <button id="insertRowAboveBtn" class="advancedOnly" data-i18n="button.insertRowAbove">上に行追加</button>
       <button id="insertRowBelowBtn" data-i18n="button.insertRowBelow">下に行追加</button>
       <button id="deleteCurrentRowBtn" class="danger" data-i18n="button.deleteCurrentRow">現在行を削除</button>
@@ -1037,7 +1037,7 @@
           <input id="waveformOffsetMs" type="number" value="0" step="10" style="width:62px;">
         </span>
         <span class="monitorIntervalInline">
-          <span class="small" data-i18n="setting.monitorInterval">字幕位置マーク更新周期</span>
+          <span class="small" data-i18n="setting.monitorInterval">プレビュー・字幕位置更新周期</span>
           <input id="monitorIntervalMs" type="number" value="50" min="20" max="1000" step="10" style="width:62px;">
           <button id="applyMonitorIntervalBtn" data-i18n="button.apply">適用</button>
         </span>
@@ -1066,7 +1066,7 @@
 <div id="sttvVideoExportModal" class="sttvVideoExportModal" aria-hidden="true">
   <div class="sttvVideoExportDialog" role="dialog" aria-modal="true" aria-labelledby="sttvVideoExportTitle">
     <div class="sttvVideoExportHeader">
-      <div id="sttvVideoExportTitle" class="title" data-i18n="sttv.title">プレビュー / 簡易字幕付き動画作成</div>
+      <div id="sttvVideoExportTitle" class="title" data-i18n="sttv.title">プレビュー / 簡易字幕付き動画作成 β</div>
       <button id="sttvVideoExportCloseX" class="previewCloseX" data-i18n="preview.close">閉じる</button>
     </div>
     <div id="sttvRoot" class="sttv-root">
@@ -1207,12 +1207,12 @@
       "setting.tapOffset": "タップ入力オフセット",
       "setting.waveformOffset": "波形表示オフセット",
       "help.shortcuts": "<span class=\"kbd\">Space</span> 再生/停止　<span class=\"kbd\">R</span> 開始ON・次行へ　<span class=\"kbd\">E</span> 終了OFF（設定によりE対象を切替）<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> 字幕行移動　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> 音源を2秒移動　<span class=\"kbd\">Z</span> 直前操作をアンドゥ<br><span class=\"kbd\">Ins</span> 下に行追加　<span class=\"kbd\">Shift+Ins</span> 上に行追加　<span class=\"kbd\">Del</span> 現在行削除　<span class=\"kbd\">Backspace</span> 時刻消去<br>途中保存では、未設定時刻も <span class=\"kbd\">--:--,---</span> として保存します。<br>右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。",
-      "setting.monitorInterval": "字幕位置マーク更新周期",
+      "setting.monitorInterval": "プレビュー・字幕位置更新周期",
       "button.apply": "適用",
       "label.outputFile": "SRT出力ファイル名",
       "button.preview": "プレビュー",
-      "button.previewVideoExport": "プレビュー / 動画作成",
-      "sttv.title": "プレビュー / 簡易字幕付き動画作成",
+      "button.previewVideoExport": "プレビュー / 動画作成β",
+      "sttv.title": "プレビュー / 簡易字幕付き動画作成 β",
       "sttv.section.image": "1. 画像",
       "sttv.imageFile": "画像ファイル",
       "sttv.clearImage": "画像をクリア",
@@ -1329,12 +1329,12 @@
       "setting.tapOffset": "Tap input offset",
       "setting.waveformOffset": "Waveform display offset",
       "help.shortcuts": "<span class=\"kbd\">Space</span> Play/Pause　<span class=\"kbd\">R</span> Set start & advance　<span class=\"kbd\">E</span> Set end (target depends on setting)<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> Move row　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> Seek audio by 2 seconds　<span class=\"kbd\">Z</span> Undo last operation<br><span class=\"kbd\">Ins</span> Insert below　<span class=\"kbd\">Shift+Ins</span> Insert above　<span class=\"kbd\">Del</span> Delete current row　<span class=\"kbd\">Backspace</span> Clear time<br>Draft export saves missing times as <span class=\"kbd\">--:--,---</span>.<br>Double-click a subtitle row to seek the audio to that row's start time.",
-      "setting.monitorInterval": "Subtitle position mark update interval",
+      "setting.monitorInterval": "Preview/subtitle update interval",
       "button.apply": "Apply",
       "label.outputFile": "SRT output filename",
       "button.preview": "Preview",
-      "button.previewVideoExport": "Preview / Video Export",
-      "sttv.title": "Preview / Simple Subtitle Video Export",
+      "button.previewVideoExport": "Preview / Video Export β",
+      "sttv.title": "Preview / Simple Subtitle Video Export β",
       "sttv.section.image": "1. Image",
       "sttv.imageFile": "Image file",
       "sttv.clearImage": "Clear image",
