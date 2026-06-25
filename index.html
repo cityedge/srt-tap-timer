@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>SRT Tap Timer v1.55</title>
+<title>SRT Tap Timer v1.60</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
@@ -599,7 +599,7 @@
     }
   }
 
-  /* v1.51 experimental: removed video preview placeholder subtitle. */
+  /* Video preview placeholder subtitle removed. */
   .sttvVideoExportModal {
     position: fixed;
     inset: 0;
@@ -854,7 +854,7 @@
 <body tabindex="-1">
 <header>
   <div class="headerMain">
-    <h1>SRT Tap Timer v1.55</h1>
+    <h1>SRT Tap Timer v1.60</h1>
     <div class="sub" data-i18n="app.subtitle">
       メタタグ付き歌詞テキストから歌詞行だけを抽出し、音源を聴きながらキーボードでSRTタイミングを打ち直すローカルツールです。
     </div>
@@ -870,6 +870,11 @@
         <option value="ja">日本語</option>
         <option value="en">English</option>
       </select>
+    </div>
+    <div class="projectButtonBox">
+      <button id="saveProjectBtn" data-i18n="button.saveProject">作業保存</button>
+      <button id="loadProjectBtn" data-i18n="button.loadProject">作業復元</button>
+      <input id="projectFile" type="file" accept=".json,application/json" style="display:none;">
     </div>
     <div class="clearButtonBox">
       <button id="clearAllBtn" class="danger" data-i18n="button.clearAll">オールクリア</button>
@@ -990,6 +995,9 @@
       <span class="kbd">↑</span>/<span class="kbd">↓</span> 字幕行移動　
       <span class="kbd">←</span>/<span class="kbd">→</span> 音源を2秒移動　
       <span class="kbd">Z</span> 直前操作をアンドゥ<br>
+      <span class="kbd">Shift+R</span> 前行終了＋現在行開始を同時修正　
+      <span class="kbd">Shift+E</span> 最後にRでONした行を終了<br>
+      <span class="kbd">Shift+←</span>/<span class="kbd">Shift+→</span> 現在行の開始を0.1秒微調整<br>
       右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。
     </div>
 
@@ -1013,7 +1021,7 @@
     </div>
 
     <div class="toolbar">
-      <button id="previewBtn" data-i18n="button.previewVideoExport">プレビュー / 動画作成β</button>
+      <button id="previewBtn" data-i18n="button.previewVideoExport">プレビュー / 動画作成</button>
       <button id="insertRowAboveBtn" class="advancedOnly" data-i18n="button.insertRowAbove">上に行追加</button>
       <button id="insertRowBelowBtn" data-i18n="button.insertRowBelow">下に行追加</button>
       <button id="deleteCurrentRowBtn" class="danger" data-i18n="button.deleteCurrentRow">現在行を削除</button>
@@ -1037,7 +1045,7 @@
           <input id="waveformOffsetMs" type="number" value="0" step="10" style="width:62px;">
         </span>
         <span class="monitorIntervalInline">
-          <span class="small" data-i18n="setting.monitorInterval">プレビュー・字幕位置更新周期</span>
+          <span class="small" data-i18n="setting.monitorInterval">字幕位置マーク更新周期</span>
           <input id="monitorIntervalMs" type="number" value="50" min="20" max="1000" step="10" style="width:62px;">
           <button id="applyMonitorIntervalBtn" data-i18n="button.apply">適用</button>
         </span>
@@ -1066,7 +1074,7 @@
 <div id="sttvVideoExportModal" class="sttvVideoExportModal" aria-hidden="true">
   <div class="sttvVideoExportDialog" role="dialog" aria-modal="true" aria-labelledby="sttvVideoExportTitle">
     <div class="sttvVideoExportHeader">
-      <div id="sttvVideoExportTitle" class="title" data-i18n="sttv.title">プレビュー / 簡易字幕付き動画作成 β</div>
+      <div id="sttvVideoExportTitle" class="title" data-i18n="sttv.title">プレビュー / 簡易字幕付き動画作成</div>
       <button id="sttvVideoExportCloseX" class="previewCloseX" data-i18n="preview.close">閉じる</button>
     </div>
     <div id="sttvRoot" class="sttv-root">
@@ -1180,6 +1188,17 @@
       "button.clearText": "テキストクリア",
       "button.clearRows": "編集画面クリア",
       "button.clearAll": "オールクリア",
+      "button.saveProject": "作業保存",
+      "button.loadProject": "作業復元",
+      "project.saveDone": "作業ファイルを書き出しました",
+      "project.loadDone": "作業ファイルを復元しました",
+      "project.loadCanceled": "作業復元をキャンセルしました。",
+      "project.loadFailed": "作業ファイルの読み込みに失敗しました",
+      "project.invalid": "SRT Tap Timerの作業ファイルとして読み込めませんでした。",
+      "project.filesNotLoadedTitle": "作業を復元しました。\n\nファイル本体は読み込まれていません。必要に応じて、音源ファイルと画像ファイルを再選択してください。\n",
+      "project.sourceTextSrt": "テキスト／SRTファイル",
+      "project.sourceAudio": "音源ファイル",
+      "project.sourceImage": "画像ファイル",
       "label.editText": "抽出・編集用テキスト",
       "button.applyLyrics": "字幕行リストに反映",
       "help.cutTargets": "カット対象：空行、<span class=\"kbd\">[Verse]</span> のような [] 行、SRT番号行、SRT時刻行、WEBVTT行。複数行字幕は <span class=\"kbd\">\\n</span> で指定できます。",
@@ -1206,13 +1225,13 @@
       "setting.eSelectedMode": "Eは「現在選択中の行」の終了時刻を変更し、次の行へ進む（SRT再編集向け）。OFF時は、最後にRでONした行を終了します。",
       "setting.tapOffset": "タップ入力オフセット",
       "setting.waveformOffset": "波形表示オフセット",
-      "help.shortcuts": "<span class=\"kbd\">Space</span> 再生/停止　<span class=\"kbd\">R</span> 開始ON・次行へ　<span class=\"kbd\">E</span> 終了OFF（設定によりE対象を切替）<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> 字幕行移動　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> 音源を2秒移動　<span class=\"kbd\">Z</span> 直前操作をアンドゥ<br><span class=\"kbd\">Ins</span> 下に行追加　<span class=\"kbd\">Shift+Ins</span> 上に行追加　<span class=\"kbd\">Del</span> 現在行削除　<span class=\"kbd\">Backspace</span> 時刻消去<br>途中保存では、未設定時刻も <span class=\"kbd\">--:--,---</span> として保存します。<br>右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。",
-      "setting.monitorInterval": "プレビュー・字幕位置更新周期",
+      "help.shortcuts": "<span class=\"kbd\">Space</span> 再生/停止　<span class=\"kbd\">R</span> 開始ON・次行へ　<span class=\"kbd\">E</span> 終了OFF（設定によりE対象を切替）<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> 字幕行移動　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> 音源を2秒移動　<span class=\"kbd\">Z</span> 直前操作をアンドゥ<br><span class=\"kbd\">Shift+R</span> 前行終了＋現在行開始を同時修正　<span class=\"kbd\">Shift+E</span> 最後にRでONした行を終了<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> 現在行の開始を0.1秒微調整<br><span class=\"kbd\">Ins</span> 下に行追加　<span class=\"kbd\">Shift+Ins</span> 上に行追加　<span class=\"kbd\">Del</span> 現在行削除　<span class=\"kbd\">Backspace</span> 時刻消去<br>途中保存では、未設定時刻も <span class=\"kbd\">--:--,---</span> として保存します。<br>右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。",
+      "setting.monitorInterval": "字幕位置マーク更新周期",
       "button.apply": "適用",
       "label.outputFile": "SRT出力ファイル名",
       "button.preview": "プレビュー",
-      "button.previewVideoExport": "プレビュー / 動画作成β",
-      "sttv.title": "プレビュー / 簡易字幕付き動画作成 β",
+      "button.previewVideoExport": "プレビュー / 動画作成",
+      "sttv.title": "プレビュー / 簡易字幕付き動画作成",
       "sttv.section.image": "1. 画像",
       "sttv.imageFile": "画像ファイル",
       "sttv.clearImage": "画像をクリア",
@@ -1302,6 +1321,17 @@
       "button.clearText": "Clear text",
       "button.clearRows": "Clear rows",
       "button.clearAll": "Clear all",
+      "button.saveProject": "Save project",
+      "button.loadProject": "Restore project",
+      "project.saveDone": "Project file exported",
+      "project.loadDone": "Project file restored",
+      "project.loadCanceled": "Project restore was canceled.",
+      "project.loadFailed": "Failed to load project file",
+      "project.invalid": "This file could not be loaded as an SRT Tap Timer project file.",
+      "project.filesNotLoadedTitle": "Project restored.\n\nThe original files themselves are not loaded. Re-select the audio file and image file if needed.\n",
+      "project.sourceTextSrt": "Text / SRT file",
+      "project.sourceAudio": "Audio file",
+      "project.sourceImage": "Image file",
       "label.editText": "Extracted / editable text",
       "button.applyLyrics": "Apply to subtitle rows",
       "help.cutTargets": "Removed lines: blank lines, metadata lines such as <span class=\"kbd\">[Verse]</span>, SRT index lines, SRT timing lines, and WEBVTT lines. Use <span class=\"kbd\">\\n</span> for multi-line subtitles.",
@@ -1328,13 +1358,13 @@
       "setting.eSelectedMode": "E edits the end time of the currently selected row and advances to the next row (for SRT re-editing). When OFF, E closes the last row started by R.",
       "setting.tapOffset": "Tap input offset",
       "setting.waveformOffset": "Waveform display offset",
-      "help.shortcuts": "<span class=\"kbd\">Space</span> Play/Pause　<span class=\"kbd\">R</span> Set start & advance　<span class=\"kbd\">E</span> Set end (target depends on setting)<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> Move row　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> Seek audio by 2 seconds　<span class=\"kbd\">Z</span> Undo last operation<br><span class=\"kbd\">Ins</span> Insert below　<span class=\"kbd\">Shift+Ins</span> Insert above　<span class=\"kbd\">Del</span> Delete current row　<span class=\"kbd\">Backspace</span> Clear time<br>Draft export saves missing times as <span class=\"kbd\">--:--,---</span>.<br>Double-click a subtitle row to seek the audio to that row's start time.",
-      "setting.monitorInterval": "Preview/subtitle update interval",
+      "help.shortcuts": "<span class=\"kbd\">Space</span> Play/Pause　<span class=\"kbd\">R</span> Set start & advance　<span class=\"kbd\">E</span> Set end (target depends on setting)<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> Move row　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> Seek audio by 2 seconds　<span class=\"kbd\">Z</span> Undo last operation<br><span class=\"kbd\">Shift+R</span> Retiming boundary　<span class=\"kbd\">Shift+E</span> End last row started by R<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> Nudge current start by 0.1s<br><span class=\"kbd\">Ins</span> Insert below　<span class=\"kbd\">Shift+Ins</span> Insert above　<span class=\"kbd\">Del</span> Delete current row　<span class=\"kbd\">Backspace</span> Clear time<br>Draft export saves missing times as <span class=\"kbd\">--:--,---</span>.<br>Double-click a subtitle row to seek the audio to that row's start time.",
+      "setting.monitorInterval": "Subtitle position mark update interval",
       "button.apply": "Apply",
       "label.outputFile": "SRT output filename",
       "button.preview": "Preview",
-      "button.previewVideoExport": "Preview / Video Export β",
-      "sttv.title": "Preview / Simple Subtitle Video Export β",
+      "button.previewVideoExport": "Preview / Video Export",
+      "sttv.title": "Preview / Simple Subtitle Video Export",
       "sttv.section.image": "1. Image",
       "sttv.imageFile": "Image file",
       "sttv.clearImage": "Clear image",
@@ -1470,6 +1500,7 @@
   let waveformReady = false;
   let waveformMessageKey = "waveform.noAudio";
   let currentAudioFile = null;
+  let currentLyricsFileName = "";
   let selectedEditorDirty = false;
   let videoExportOpen = false;
   let videoExport = null;
@@ -2071,12 +2102,12 @@
     focusApp();
   }
 
-  function setCurrentIndex(i) {
+  function setCurrentIndex(i, scrollMode = "nearest") {
     currentIndex = clampIndex(i);
     selectedEditorDirty = false;
     render();
     loadSelectedRowEditor(true);
-    scrollCurrentIntoView();
+    scrollCurrentIntoView(scrollMode);
     focusApp();
   }
 
@@ -2097,12 +2128,22 @@
       const row = document.querySelector(`tr[data-i="${currentIndex}"]`);
       if (!row) return;
 
+      const wrap = row.closest(".tableWrap");
+
+      if (mode === "top") {
+        if (wrap) {
+          wrap.scrollTop = 0;
+        } else {
+          row.scrollIntoView({ block: "start" });
+        }
+        return;
+      }
+
       if (mode !== "comfortable") {
         row.scrollIntoView({ block: "nearest" });
         return;
       }
 
-      const wrap = row.closest(".tableWrap");
       if (!wrap) {
         row.scrollIntoView({ block: "nearest" });
         return;
@@ -2126,6 +2167,70 @@
     });
   }
 
+
+  function nudgeCurrentStart(deltaSeconds) {
+    if (!lines.length) return;
+
+    const i = currentIndex;
+    const line = lines[i];
+    if (!line || line.start == null) {
+      log(currentLang === "ja"
+        ? "開始時刻を微調整する行に開始時刻がありません。"
+        : "The current row has no start time to nudge."
+      );
+      focusApp();
+      return;
+    }
+
+    pushUndo();
+
+    const oldStart = line.start;
+    const newStart = Math.max(0, oldStart + deltaSeconds);
+    const prevIndex = i - 1;
+    let adjustedPrev = false;
+
+    line.start = newStart;
+
+    if (prevIndex >= 0) {
+      const prevLine = lines[prevIndex];
+
+      if (deltaSeconds < 0) {
+        // Shift+Left:
+        // 現在行の開始を早めた結果、前行の終了と重複した場合は前行終了を現在行開始まで詰める。
+        if (prevLine.end != null && prevLine.end > newStart) {
+          prevLine.end = newStart;
+          adjustedPrev = true;
+        }
+      } else if (deltaSeconds > 0) {
+        // Shift+Right:
+        // 遅くする前の現在行開始と前行終了が同一だった場合に限り、
+        // 前行終了も同じだけ遅らせる。すでにギャップがある場合は前行終了を触らない。
+        const eps = 0.0005;
+        if (prevLine.end != null && Math.abs(prevLine.end - oldStart) <= eps) {
+          prevLine.end = Math.max(0, prevLine.end + deltaSeconds);
+          adjustedPrev = true;
+        }
+      }
+    }
+
+    render();
+    loadSelectedRowEditor(true);
+    scrollCurrentIntoView("nearest");
+
+    const keyName = deltaSeconds < 0 ? "Shift+←" : "Shift+→";
+    const moveText = deltaSeconds < 0
+      ? (currentLang === "ja" ? "早めました" : "earlier")
+      : (currentLang === "ja" ? "遅くしました" : "later");
+
+    if (currentLang === "ja") {
+      log(`${keyName}: ${i + 1}行目の開始を0.1秒${moveText}。${adjustedPrev ? "前行の終了時刻も調整しました。" : ""}`);
+    } else {
+      log(`${keyName}: Nudged row ${i + 1} start 0.1s ${moveText}.${adjustedPrev ? " Also adjusted the previous row end." : ""}`);
+    }
+
+    focusApp();
+  }
+
   function togglePlay() {
     if (!audio.src) {
       log("先に音源ファイルを読み込んでください。");
@@ -2143,7 +2248,7 @@
     focusApp();
   }
 
-  function markStart() {
+  function markStart(forcePrevEnd = false) {
     if (!lines.length) {
       log(currentLang === "ja" ? "先に歌詞行を反映してください。" : "Apply lyric lines first.");
       return;
@@ -2156,6 +2261,47 @@
     pushUndo();
     const t = getTapAdjustedTime();
     const i = currentIndex;
+
+    // Shift+R は完成済みSRT再編集用の「境界修正」操作。
+    // 通常Rの activeIndex 処理や「現在行終了時刻の自動クリア」は使わない。
+    // 現在行の開始時刻と、1つ前の行の終了時刻だけを現在時刻に合わせる。
+    if (forcePrevEnd) {
+      const prevIndex = i - 1;
+      lines[i].start = t;
+      let forcedPrevEnd = false;
+
+      if (prevIndex >= 0) {
+        lines[prevIndex].end = t;
+        forcedPrevEnd = true;
+      }
+
+      activeIndex = null;
+
+      if (i < lines.length - 1) {
+        currentIndex = i + 1;
+      }
+
+      render();
+      scrollCurrentIntoView("comfortable");
+
+      const extra = [];
+      if (forcedPrevEnd) {
+        extra.push(currentLang === "ja"
+          ? "1つ前の行の終了時刻も同じ時刻に合わせました。"
+          : "Also set the previous row end time to the same timestamp.");
+      } else {
+        extra.push(currentLang === "ja"
+          ? "1つ前の行はありません。"
+          : "There is no previous row.");
+      }
+
+      log(currentLang === "ja"
+        ? `Shift+R: ${i + 1}行目の開始 ${formatSrtTime(t)} を設定しました。${extra.length ? " " + extra.join(" ") : ""}`
+        : `Shift+R: Set row ${i + 1} start to ${formatSrtTime(t)}.${extra.length ? " " + extra.join(" ") : ""}`
+      );
+      focusApp();
+      return;
+    }
 
     // 通常の新規タップでは、前回Rで開始した行を次のR時刻で閉じる。
     // ただし、同じ行を打ち直している場合は、その行を同時に閉じない。
@@ -2224,10 +2370,12 @@
     focusApp();
   }
 
-  function markEnd() {
+  function markEnd(forceActiveMode = false) {
     if (!audio.src) return;
 
-    const selectedMode = $("endSelectedLineMode")?.checked;
+    // Shift+E は、E再編集モードのON/OFFに関係なく、
+    // 「最後にRでONした行をOFFする」通常OFFモードの挙動を強制する。
+    const selectedMode = forceActiveMode ? false : $("endSelectedLineMode")?.checked;
     let targetIndex = selectedMode ? currentIndex : activeIndex;
 
     if (targetIndex === null || targetIndex < 0 || targetIndex >= lines.length) {
@@ -2256,7 +2404,8 @@
     render();
     scrollCurrentIntoView("comfortable");
     const nextMsg = selectedMode && ended < lines.length - 1 ? " 次の行へ進みました。" : "";
-    log(`E: ${ended + 1}行目の終了 ${formatSrtTime(t)} を設定しました。${nextMsg}`);
+    const prefix = forceActiveMode ? "Shift+E" : "E";
+    log(`${prefix}: ${ended + 1}行目の終了 ${formatSrtTime(t)} を設定しました。${nextMsg}`);
     focusApp();
   }
 
@@ -2448,6 +2597,7 @@
     audio.removeAttribute("src");
     audio.load();
     currentAudioFile = null;
+    currentLyricsFileName = "";
     resetWaveform(isWaveformEnabled() ? "waveform.noAudio" : "waveform.disabled");
 
     outputNameTouched = false;
@@ -3123,6 +3273,42 @@
       redraw();
     }
 
+    function getProjectState() {
+      return {
+        shortVideo: !!els.shortVideo.checked,
+        imageFit: Number(els.imageFit.value) || 0,
+        subtitleY: Number(els.subtitleY.value) || 84,
+        fontSize: Number(els.fontSize.value) || 45,
+        useOutline: !!els.useOutline.checked,
+        useBand: !!els.useBand.checked,
+        sourceNames: {
+          image: state.sourceNames.image || "",
+          audio: state.sourceNames.audio || "",
+          srt: state.sourceNames.srt || ""
+        }
+      };
+    }
+
+    function applyProjectState(projectState) {
+      const s = projectState || {};
+      if (Object.prototype.hasOwnProperty.call(s, "shortVideo")) els.shortVideo.checked = !!s.shortVideo;
+      if (Number.isFinite(Number(s.imageFit))) els.imageFit.value = Math.max(0, Math.min(100, Math.round(Number(s.imageFit))));
+      if (Number.isFinite(Number(s.subtitleY))) els.subtitleY.value = Math.max(4, Math.min(96, Math.round(Number(s.subtitleY))));
+      if (Number.isFinite(Number(s.fontSize))) els.fontSize.value = Math.max(24, Math.min(72, Math.round(Number(s.fontSize))));
+      if (Object.prototype.hasOwnProperty.call(s, "useOutline")) els.useOutline.checked = !!s.useOutline;
+      if (Object.prototype.hasOwnProperty.call(s, "useBand")) els.useBand.checked = !!s.useBand;
+
+      if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
+      state.imageUrl = "";
+      state.imageObj = null;
+      state.sourceNames.image = "";
+      els.imageInput.value = "";
+
+      setupCanvasSize();
+      redraw();
+      setStatus();
+    }
+
     function refreshLanguage() {
       setStatus();
       redraw();
@@ -3212,7 +3398,9 @@
       pausePreview,
       refreshLanguage,
       destroy,
-      getState
+      getState,
+      getProjectState,
+      applyProjectState
     };
   }
 
@@ -3369,6 +3557,300 @@
     if (normalized === "2") return "draft";
     return "cancel";
   }
+
+
+  function sanitizeDownloadName(name, fallback) {
+    const cleaned = String(name || fallback || "download").trim().replace(/[\\/:*?"<>|]+/g, "_");
+    return cleaned || fallback || "download";
+  }
+
+  function parseProjectNullableTime(value) {
+    if (value == null || value === "") return null;
+    const n = Number(value);
+    if (!Number.isFinite(n) || n < 0) return null;
+    return n;
+  }
+
+  function normalizeProjectLines(items) {
+    if (!Array.isArray(items)) return [];
+    return items.map(item => ({
+      text: String(item && item.text != null ? item.text : ""),
+      start: parseProjectNullableTime(item && item.start),
+      end: parseProjectNullableTime(item && item.end),
+      selected: !!(item && item.selected)
+    }));
+  }
+
+  function getVideoProjectStateForSave() {
+    if (videoExport && typeof videoExport.getProjectState === "function") {
+      return videoExport.getProjectState();
+    }
+    return {
+      shortVideo: !!$("sttvShortVideo")?.checked,
+      imageFit: Number($("sttvImageFit")?.value) || 0,
+      subtitleY: Number($("sttvSubtitleY")?.value) || 84,
+      fontSize: Number($("sttvFontSize")?.value) || 45,
+      useOutline: !!$("sttvUseOutline")?.checked,
+      useBand: !!$("sttvUseBand")?.checked,
+      sourceNames: {
+        image: "",
+        audio: currentAudioFile ? currentAudioFile.name : "",
+        srt: "SRT Tap Timer lines"
+      }
+    };
+  }
+
+  function buildProjectData() {
+    const videoProjectState = getVideoProjectStateForSave();
+    return {
+      format: "SRT Tap Timer Project",
+      schemaVersion: 1,
+      appVersion: "1.56",
+      savedAt: new Date().toISOString(),
+      sourceFiles: {
+        textSrt: currentLyricsFileName || "",
+        audio: currentAudioFile ? currentAudioFile.name : "",
+        image: videoProjectState?.sourceNames?.image || ""
+      },
+      output: {
+        srtFileName: outputFileName.value || "",
+        sourceBaseName,
+        outputNameTouched
+      },
+      text: {
+        lyricsText: lyricsText.value || ""
+      },
+      state: {
+        currentIndex,
+        activeIndex,
+        audioCurrentTime: Number.isFinite(audio.currentTime) ? audio.currentTime : 0
+      },
+      settings: {
+        language: currentLang,
+        advancedMode: !!$("advancedMode")?.checked,
+        encoding: encodingSelect.value || "auto",
+        removeAsciiParenLines: !!$("removeAsciiParenLines")?.checked,
+        waveformEnabled: !!$("waveformEnabled")?.checked,
+        autoTrimPrev: !!$("autoTrimPrevEnd")?.checked,
+        endSelectedLineMode: !!$("endSelectedLineMode")?.checked,
+        tapOffsetMs: Number($("tapOffsetMs")?.value) || 0,
+        waveformOffsetMs: Number($("waveformOffsetMs")?.value) || 0,
+        monitorIntervalMs
+      },
+      videoSettings: {
+        shortVideo: !!videoProjectState.shortVideo,
+        imageFit: Number(videoProjectState.imageFit) || 0,
+        subtitleY: Number(videoProjectState.subtitleY) || 84,
+        fontSize: Number(videoProjectState.fontSize) || 45,
+        useOutline: !!videoProjectState.useOutline,
+        useBand: !!videoProjectState.useBand
+      },
+      lines: lines.map(line => ({
+        text: String(line.text ?? ""),
+        start: line.start == null ? null : Number(line.start),
+        end: line.end == null ? null : Number(line.end),
+        selected: !!line.selected
+      }))
+    };
+  }
+
+  function saveProject() {
+    const project = buildProjectData();
+    const json = JSON.stringify(project, null, 2);
+    const blob = new Blob([json], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    const baseName = (outputFileName.value || sourceBaseName || "srt_tap_timer_project").replace(/\.[^.]+$/, "");
+    const name = sanitizeDownloadName(baseName, "srt_tap_timer_project") + ".srt-tap-project.json";
+
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    log(`${tr("project.saveDone")}: ${name}`);
+    focusApp();
+  }
+
+  function normalizeProjectData(data) {
+    if (!data || data.format !== "SRT Tap Timer Project") {
+      throw new Error(tr("project.invalid"));
+    }
+    const projectLines = normalizeProjectLines(data.lines);
+    const lineCount = projectLines.length;
+
+    const rawCurrent = Number(data.state && data.state.currentIndex);
+    const normalizedCurrent = lineCount
+      ? Math.max(0, Math.min(lineCount - 1, Number.isFinite(rawCurrent) ? Math.round(rawCurrent) : 0))
+      : 0;
+
+    const rawActive = data.state && data.state.activeIndex;
+    let normalizedActive = null;
+    if (rawActive != null && Number.isFinite(Number(rawActive))) {
+      const n = Math.round(Number(rawActive));
+      if (n >= 0 && n < lineCount) normalizedActive = n;
+    }
+
+    return {
+      sourceFiles: {
+        textSrt: String(data.sourceFiles && (data.sourceFiles.textSrt || data.sourceFiles.lyrics) || ""),
+        audio: String(data.sourceFiles && data.sourceFiles.audio || ""),
+        image: String(data.sourceFiles && data.sourceFiles.image || "")
+      },
+      output: {
+        srtFileName: String(data.output && data.output.srtFileName || ""),
+        sourceBaseName: String(data.output && data.output.sourceBaseName || ""),
+        outputNameTouched: !!(data.output && data.output.outputNameTouched)
+      },
+      text: {
+        lyricsText: String(data.text && data.text.lyricsText || "")
+      },
+      state: {
+        currentIndex: normalizedCurrent,
+        activeIndex: normalizedActive
+      },
+      settings: data.settings || {},
+      videoSettings: data.videoSettings || {},
+      lines: projectLines
+    };
+  }
+
+  function clearLoadedFilesForProjectRestore() {
+    lyricsFile.value = "";
+    audioFile.value = "";
+    if (audioObjectUrl) {
+      URL.revokeObjectURL(audioObjectUrl);
+      audioObjectUrl = null;
+    }
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+    currentAudioFile = null;
+    resetWaveform(isWaveformEnabled() ? "waveform.noAudio" : "waveform.disabled");
+
+    if (videoExport) {
+      if (typeof videoExport.clearImage === "function") videoExport.clearImage();
+      if (typeof videoExport.setAudioUrl === "function") videoExport.setAudioUrl("", "audio");
+    }
+  }
+
+  function applyProjectToVideoSettings(videoSettings) {
+    const s = videoSettings || {};
+    if ($("sttvShortVideo")) $("sttvShortVideo").checked = !!s.shortVideo;
+    if ($("sttvImageFit") && Number.isFinite(Number(s.imageFit))) $("sttvImageFit").value = Math.max(0, Math.min(100, Math.round(Number(s.imageFit))));
+    if ($("sttvSubtitleY") && Number.isFinite(Number(s.subtitleY))) $("sttvSubtitleY").value = Math.max(4, Math.min(96, Math.round(Number(s.subtitleY))));
+    if ($("sttvFontSize") && Number.isFinite(Number(s.fontSize))) $("sttvFontSize").value = Math.max(24, Math.min(72, Math.round(Number(s.fontSize))));
+    if ($("sttvUseOutline") && Object.prototype.hasOwnProperty.call(s, "useOutline")) $("sttvUseOutline").checked = !!s.useOutline;
+    if ($("sttvUseBand") && Object.prototype.hasOwnProperty.call(s, "useBand")) $("sttvUseBand").checked = !!s.useBand;
+
+    if (videoExport && typeof videoExport.applyProjectState === "function") {
+      videoExport.applyProjectState(s);
+    }
+  }
+
+  function applyProjectData(project) {
+    if (videoExport && videoExport.getState && videoExport.getState().recording) {
+      throw new Error(currentLang === "ja"
+        ? "録画中は作業復元できません。"
+        : "Cannot restore a project while recording.");
+    }
+
+    if (videoExportOpen) {
+      closeVideoExport();
+    }
+
+    clearLoadedFilesForProjectRestore();
+
+    lines = project.lines;
+    currentIndex = project.state.currentIndex;
+    activeIndex = project.state.activeIndex;
+    undoStack = [];
+    selectedEditorDirty = false;
+
+    lyricsText.value = project.text.lyricsText;
+    currentLyricsFileName = project.sourceFiles.textSrt || "";
+
+    if (project.output.srtFileName) {
+      outputFileName.value = project.output.srtFileName;
+      sourceBaseName = project.output.sourceBaseName || project.output.srtFileName.replace(/\.[^.]+$/, "") || "subtitles";
+      outputNameTouched = project.output.outputNameTouched;
+    } else {
+      outputNameTouched = false;
+      setDefaultOutputName(project.output.sourceBaseName || project.sourceFiles.textSrt || "subtitles");
+    }
+
+    const s = project.settings || {};
+    if (s.language === "ja" || s.language === "en") {
+      applyLanguage(s.language);
+    }
+    if ($("advancedMode") && Object.prototype.hasOwnProperty.call(s, "advancedMode")) {
+      $("advancedMode").checked = !!s.advancedMode;
+      applyAdvancedMode();
+    }
+    if (s.encoding && $("encodingSelect")) $("encodingSelect").value = s.encoding;
+    if ($("removeAsciiParenLines") && Object.prototype.hasOwnProperty.call(s, "removeAsciiParenLines")) $("removeAsciiParenLines").checked = !!s.removeAsciiParenLines;
+    if ($("waveformEnabled") && Object.prototype.hasOwnProperty.call(s, "waveformEnabled")) $("waveformEnabled").checked = !!s.waveformEnabled;
+    if ($("autoTrimPrevEnd") && Object.prototype.hasOwnProperty.call(s, "autoTrimPrev")) $("autoTrimPrevEnd").checked = !!s.autoTrimPrev;
+    if ($("endSelectedLineMode") && Object.prototype.hasOwnProperty.call(s, "endSelectedLineMode")) $("endSelectedLineMode").checked = !!s.endSelectedLineMode;
+    if ($("tapOffsetMs") && Number.isFinite(Number(s.tapOffsetMs))) $("tapOffsetMs").value = String(Number(s.tapOffsetMs));
+    if ($("waveformOffsetMs") && Number.isFinite(Number(s.waveformOffsetMs))) $("waveformOffsetMs").value = String(Number(s.waveformOffsetMs));
+
+    if ($("monitorIntervalMs") && Number.isFinite(Number(s.monitorIntervalMs))) {
+      monitorIntervalMs = Math.max(20, Math.min(1000, Math.round(Number(s.monitorIntervalMs))));
+      $("monitorIntervalMs").value = String(monitorIntervalMs);
+      setupMonitorTimer();
+    }
+
+    resetWaveform(isWaveformEnabled() ? "waveform.noAudio" : "waveform.disabled");
+
+    applyProjectToVideoSettings(project.videoSettings);
+
+    const autoAdjusted = enforceMonitorIntervalForLargeRows();
+    render();
+    loadSelectedRowEditor(true);
+    scrollCurrentIntoView();
+
+    const info = [
+      tr("project.filesNotLoadedTitle"),
+      `${tr("project.sourceTextSrt")}: ${project.sourceFiles.textSrt || tr("none")}`,
+      `${tr("project.sourceAudio")}: ${project.sourceFiles.audio || tr("none")}`,
+      `${tr("project.sourceImage")}: ${project.sourceFiles.image || tr("none")}`
+    ].join("\n");
+
+    alert(info);
+    log(`${tr("project.loadDone")}: ${project.lines.length} ${currentLang === "ja" ? "行" : "rows"}${autoAdjusted ? monitorAutoAdjustMessage() : ""}`);
+    focusApp();
+  }
+
+  async function loadProjectFile(file) {
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const project = normalizeProjectData(parsed);
+      applyProjectData(project);
+    } catch (e) {
+      alert(`${tr("project.loadFailed")}: ${e.message}`);
+      log(`${tr("project.loadFailed")}: ${e.message}`);
+      focusApp();
+    }
+  }
+
+  function beginLoadProject() {
+    if (videoExport && videoExport.getState && videoExport.getState().recording) {
+      alert(currentLang === "ja"
+        ? "録画中は作業復元できません。"
+        : "Cannot restore a project while recording.");
+      return;
+    }
+    const input = $("projectFile");
+    input.value = "";
+    input.click();
+  }
+
 
   function exportSrt() {
     if (!lines.length) {
@@ -3629,6 +4111,7 @@
   lyricsFile.addEventListener("change", async () => {
     const file = lyricsFile.files[0];
     if (!file) return;
+    currentLyricsFileName = file.name || "";
     setDefaultOutputName(file.name);
 
     try {
@@ -3654,7 +4137,7 @@
           const autoAdjusted = enforceMonitorIntervalForLargeRows();
           render();
           loadSelectedRowEditor(true);
-          scrollCurrentIntoView();
+          scrollCurrentIntoView("top");
 
           const modeMsg = completeTimestampSrt
             ? (currentLang === "ja"
@@ -3747,6 +4230,18 @@
   });
   $("clearRowsBtn").addEventListener("click", clearRows);
   $("clearAllBtn").addEventListener("click", clearAll);
+  $("saveProjectBtn").addEventListener("click", saveProject);
+  $("loadProjectBtn").addEventListener("click", beginLoadProject);
+  $("projectFile").addEventListener("change", async () => {
+    const file = $("projectFile").files && $("projectFile").files[0];
+    if (!file) {
+      log(tr("project.loadCanceled"));
+      focusApp();
+      return;
+    }
+    await loadProjectFile(file);
+    $("projectFile").value = "";
+  });
 
   $("applyLyricsBtn").addEventListener("click", applyLyricsFromTextarea);
   $("togglePlayBtn").addEventListener("click", togglePlay);
@@ -3837,10 +4332,10 @@
       togglePlay();
     } else if (key === "r") {
       ev.preventDefault();
-      markStart();
+      markStart(ev.shiftKey);
     } else if (key === "e") {
       ev.preventDefault();
-      markEnd();
+      markEnd(ev.shiftKey);
     } else if (key === "z") {
       ev.preventDefault();
       undo();
@@ -3849,13 +4344,21 @@
       setCurrentIndex(currentIndex - 1);
     } else if (ev.key === "ArrowDown") {
       ev.preventDefault();
-      setCurrentIndex(currentIndex + 1);
+      setCurrentIndex(currentIndex + 1, "comfortable");
     } else if (ev.key === "ArrowLeft") {
       ev.preventDefault();
-      seek(-2);
+      if (ev.shiftKey) {
+        nudgeCurrentStart(-0.1);
+      } else {
+        seek(-2);
+      }
     } else if (ev.key === "ArrowRight") {
       ev.preventDefault();
-      seek(2);
+      if (ev.shiftKey) {
+        nudgeCurrentStart(0.1);
+      } else {
+        seek(2);
+      }
     } else if (ev.key === "Insert") {
       ev.preventDefault();
       if (ev.shiftKey) {

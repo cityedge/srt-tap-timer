@@ -1,5 +1,53 @@
 # Changelog
 
+## v1.60
+
+- Added `Shift + Left` and `Shift + Right` for fine start-time nudging.
+- `Shift + Left` moves the current row start time 0.1 seconds earlier. If this creates an overlap with the previous row, the previous row end time is also adjusted to the new start time.
+- `Shift + Right` moves the current row start time 0.1 seconds later. If the previous row end time exactly matched the old start time, the previous row end time is also moved 0.1 seconds later. If there was already a gap, the previous row end time is left unchanged.
+- Updated the left-pane keyboard shortcut help to include Shift+R, Shift+E, Shift+Left, and Shift+Right.
+- Regular Left / Right audio seek behavior is unchanged.
+
+## v1.59
+
+- Improved right-pane scrolling during existing SRT re-editing.
+- `ArrowDown` now uses the same comfortable downward auto-scroll behavior as real-time R/E timing input, so the current row does not get stuck at the bottom of the pane during cursor-based re-editing.
+- After successfully loading an SRT file, the right-pane table scroll position is reset to the top so row 1 remains visible.
+- Regular click selection and upward movement still use minimal scrolling.
+
+## v1.58
+
+- Added `Shift + E`.
+- `Shift + E` ignores the E re-edit mode checkbox and always performs the normal OFF behavior: it ends the last row started with `R`.
+- Regular `E` behavior is unchanged.
+- This is intended for cases where E re-edit mode is ON, but the user temporarily wants to close the active row started by `R`.
+
+## v1.57.1
+
+- Fixed the first Shift+R implementation.
+- Shift+R is now handled as a dedicated boundary retime operation for completed SRT re-editing.
+- Shift+R sets only the current row start and the previous row end to the same timestamp.
+- Shift+R no longer uses the normal R activeIndex closing logic.
+- Shift+R no longer clears the current row end time when the new start would make the current row invalid. This prevents the target row's end field from unexpectedly becoming blank.
+
+## v1.57
+
+- Added `Shift + R` for SRT re-editing.
+- `Shift + R` sets the current row start time and forcibly sets the previous row end time to the same timestamp, even when the previous row already had an end time.
+- Regular `R` behavior is unchanged.
+- This is intended for retiming completed SRT files where the next subtitle start should also close the previous subtitle.
+
+## v1.56
+
+- Added project save / restore as SRT Tap Timer project JSON.
+- Project save stores subtitle rows, the editable text area, current row, active timing row, SRT output name, key editing settings, and video export settings.
+- Project save does not store audio files, image files, generated WebM files, Undo history, waveform cache, Object URLs, or MediaRecorder state.
+- Project restore does not clear the current work when the restore button is pressed. The current work is replaced only after a project file is selected and parsed successfully.
+- After restore, a dialog shows that files themselves are not loaded and lists the saved text/SRT, audio, and image filenames.
+- Recording, SRT editing, and video export pipelines are otherwise unchanged from v1.55.1.
+
+# Changelog
+
 ## v1.55
 
 Mainstream release based on the v1.54 line.
