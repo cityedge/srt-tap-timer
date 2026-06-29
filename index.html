@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>SRT Tap Timer v1.60</title>
+<title>SRT Tap Timer v1.63.1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
@@ -849,12 +849,138 @@
     .sttv-root .sttv-video-options-row { grid-template-columns: 1fr; }
   }
 
+
+  .offsetCalModal {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(0, 0, 0, 0.70);
+  }
+  .offsetCalModal.is-open {
+    display: flex;
+  }
+  .offsetCalDialog {
+    width: min(720px, calc(100vw - 36px));
+    max-height: calc(100vh - 36px);
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #11151d;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    padding: 18px;
+  }
+  .offsetCalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .offsetCalHeader .title {
+    font-size: 18px;
+    font-weight: 800;
+  }
+  .offsetCalTargetRow {
+    display: flex;
+    gap: 18px;
+    align-items: stretch;
+    justify-content: center;
+    margin: 18px 0;
+  }
+  .offsetCalKey {
+    width: min(230px, 42vw);
+    min-height: 150px;
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 74px;
+    font-weight: 900;
+    color: var(--muted);
+    background: #0d1118;
+    opacity: 0.34;
+    transition: opacity .08s linear, transform .08s linear, border-color .08s linear, background .08s linear, color .08s linear;
+    user-select: none;
+  }
+  .offsetCalKey.is-active {
+    opacity: 1;
+    transform: scale(1.03);
+    border-color: var(--accent);
+    color: #ffffff;
+    background: #182236;
+  }
+  .offsetCalStats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .offsetCalStats .card {
+    background: #0d1118;
+  }
+  .offsetCalLarge {
+    font-size: 28px;
+    font-weight: 800;
+  }
+  .offsetCalHint {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .offsetCalStatus {
+    min-height: 24px;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .offsetCalActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+  @media (max-width: 640px) {
+    .offsetCalStats {
+      grid-template-columns: 1fr;
+    }
+    .offsetCalKey {
+      min-height: 120px;
+      font-size: 56px;
+    }
+  }
+
+
+  .offsetCalBeatPanel {
+    margin: 18px 0 14px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #0d1118;
+    text-align: center;
+  }
+  .offsetCalBeatTitle {
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .offsetCalBeatSub {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
 </style>
 </head>
 <body tabindex="-1">
 <header>
   <div class="headerMain">
-    <h1>SRT Tap Timer v1.60</h1>
+    <h1>SRT Tap Timer v1.63.1</h1>
     <div class="sub" data-i18n="app.subtitle">
       メタタグ付き歌詞テキストから歌詞行だけを抽出し、音源を聴きながらキーボードでSRTタイミングを打ち直すローカルツールです。
     </div>
@@ -991,11 +1117,13 @@
     <div class="help" data-i18n-html="help.shortcuts">
       <span class="kbd">Space</span> 再生/停止　
       <span class="kbd">R</span> 開始ON・次行へ　
+      <span class="kbd">W</span> 補正R（W補正オフセット加算）　
       <span class="kbd">E</span> 終了OFF（設定によりE対象を切替）<br>
       <span class="kbd">↑</span>/<span class="kbd">↓</span> 字幕行移動　
       <span class="kbd">←</span>/<span class="kbd">→</span> 音源を2秒移動　
       <span class="kbd">Z</span> 直前操作をアンドゥ<br>
       <span class="kbd">Shift+R</span> 前行終了＋現在行開始を同時修正　
+      <span class="kbd">Shift+W</span> 補正Shift+R　
       <span class="kbd">Shift+E</span> 最後にRでONした行を終了<br>
       <span class="kbd">Shift+←</span>/<span class="kbd">Shift+→</span> 現在行の開始を0.1秒微調整<br>
       右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。
@@ -1039,6 +1167,11 @@
         <span class="tapOffsetInline">
           <span class="small" data-i18n="setting.tapOffset">タップ入力オフセット</span>
           <input id="tapOffsetMs" type="number" value="0" step="10" style="width:62px;">
+          <button id="openOffsetCalBtn" data-i18n="button.offsetCal">補正</button>
+        </span>
+        <span class="wOffsetInline">
+          <span class="small" data-i18n="setting.wOffset">W補正オフセット</span>
+          <input id="wOffsetMs" type="number" value="-200" step="10" style="width:62px;">
         </span>
         <span class="waveformOffsetInline">
           <span class="small" data-i18n="setting.waveformOffset">波形表示オフセット</span>
@@ -1070,6 +1203,51 @@
     </div>
   </section>
 </main>
+
+
+<div id="offsetCalModal" class="offsetCalModal" aria-hidden="true">
+  <div class="offsetCalDialog" role="dialog" aria-modal="true" aria-labelledby="offsetCalTitle">
+    <div class="offsetCalHeader">
+      <div id="offsetCalTitle" class="title" data-i18n="offsetCal.title">タップ入力オフセット補正</div>
+      <button id="offsetCalCloseX" data-i18n="offsetCal.close">閉じる</button>
+    </div>
+
+    <div class="offsetCalHint" data-i18n="offsetCal.description">
+      0.5秒ごとに低いクリック音が鳴り、4回に1回だけ高いクリック音が鳴ります。高いクリック音に合わせて R キーを押してください。推奨オフセットは、1/3/5/7/9回目で中央値を更新し、9回以降は直近9回の中央値で更新します。
+    </div>
+
+    <div class="offsetCalBeatPanel">
+      <div class="offsetCalBeatTitle" data-i18n="offsetCal.beatTitle">高いクリック音に合わせて R を押してください</div>
+      <div class="offsetCalBeatSub" data-i18n="offsetCal.beatSub">低いクリック音はリズム確認用です。画面表示ではなく、音を基準にしてください。</div>
+    </div>
+
+    <audio id="offsetCalAudio" preload="auto" style="display:none;"></audio>
+
+    <div class="offsetCalStats">
+      <div class="card">
+        <div class="name" data-i18n="offsetCal.calcTarget">計算対象</div>
+        <div id="offsetCalTarget" class="value offsetCalLarge">-</div>
+      </div>
+      <div class="card">
+        <div class="name" data-i18n="offsetCal.validCount">有効タップ数</div>
+        <div id="offsetCalCount" class="value offsetCalLarge">0</div>
+      </div>
+      <div class="card">
+        <div class="name" data-i18n="offsetCal.recommended">推奨オフセット</div>
+        <div id="offsetCalOffset" class="value offsetCalLarge">-- ms</div>
+      </div>
+    </div>
+
+    <div id="offsetCalStatus" class="offsetCalStatus" data-i18n="offsetCal.statusReady">開始するとクリック音が鳴ります。</div>
+
+    <div class="offsetCalActions">
+      <button id="offsetCalStartBtn" class="primary" data-i18n="offsetCal.start">開始</button>
+      <button id="offsetCalStopBtn" data-i18n="offsetCal.stop">終了</button>
+      <button id="offsetCalApplyBtn" class="good" data-i18n="offsetCal.apply">補正</button>
+      <button id="offsetCalCancelBtn" data-i18n="offsetCal.cancel">キャンセル</button>
+    </div>
+  </div>
+</div>
 
 <div id="sttvVideoExportModal" class="sttvVideoExportModal" aria-hidden="true">
   <div class="sttvVideoExportDialog" role="dialog" aria-modal="true" aria-labelledby="sttvVideoExportTitle">
@@ -1221,11 +1399,27 @@
       "button.startOn": "R: ON",
       "button.endOff": "E: OFF",
       "button.undo": "Z: 戻す",
+      "button.offsetCal": "補正",
+      "offsetCal.title": "タップ入力オフセット補正",
+      "offsetCal.close": "閉じる",
+      "offsetCal.description": "0.5秒ごとに低いクリック音が鳴り、4回に1回だけ高いクリック音が鳴ります。高いクリック音に合わせて R キーを押してください。推奨オフセットは、1/3/5/7/9回目で中央値を更新し、9回以降は直近9回の中央値で更新します。",
+      "offsetCal.currentTarget": "現在のキー",
+      "offsetCal.calcTarget": "計算対象",
+      "offsetCal.beatTitle": "高いクリック音に合わせて R を押してください",
+      "offsetCal.beatSub": "低いクリック音はリズム確認用です。画面表示ではなく、音を基準にしてください。",
+      "offsetCal.validCount": "有効タップ数",
+      "offsetCal.recommended": "推奨オフセット",
+      "offsetCal.statusReady": "開始するとクリック音が鳴ります。",
+      "offsetCal.start": "開始",
+      "offsetCal.stop": "終了",
+      "offsetCal.apply": "補正",
+      "offsetCal.cancel": "キャンセル",
       "setting.autoTrimPrev": "Rで開始時刻をセットしたとき、前行の終了時刻が食い込んでいれば現在行の開始時刻まで詰める",
       "setting.eSelectedMode": "Eは「現在選択中の行」の終了時刻を変更し、次の行へ進む（SRT再編集向け）。OFF時は、最後にRでONした行を終了します。",
       "setting.tapOffset": "タップ入力オフセット",
+      "setting.wOffset": "W補正オフセット",
       "setting.waveformOffset": "波形表示オフセット",
-      "help.shortcuts": "<span class=\"kbd\">Space</span> 再生/停止　<span class=\"kbd\">R</span> 開始ON・次行へ　<span class=\"kbd\">E</span> 終了OFF（設定によりE対象を切替）<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> 字幕行移動　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> 音源を2秒移動　<span class=\"kbd\">Z</span> 直前操作をアンドゥ<br><span class=\"kbd\">Shift+R</span> 前行終了＋現在行開始を同時修正　<span class=\"kbd\">Shift+E</span> 最後にRでONした行を終了<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> 現在行の開始を0.1秒微調整<br><span class=\"kbd\">Ins</span> 下に行追加　<span class=\"kbd\">Shift+Ins</span> 上に行追加　<span class=\"kbd\">Del</span> 現在行削除　<span class=\"kbd\">Backspace</span> 時刻消去<br>途中保存では、未設定時刻も <span class=\"kbd\">--:--,---</span> として保存します。<br>右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。",
+      "help.shortcuts": "<span class=\"kbd\">Space</span> 再生/停止　<span class=\"kbd\">R</span> 開始ON・次行へ　<span class=\"kbd\">W</span> 補正R（Wオフセット加算）　<span class=\"kbd\">E</span> 終了OFF<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> 字幕行移動　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> 音源を2秒移動　<span class=\"kbd\">Z</span> 直前操作をアンドゥ<br><span class=\"kbd\">Shift+R</span> 前行終了＋現在行開始を同時修正　<span class=\"kbd\">Shift+W</span> 補正Shift+R　<span class=\"kbd\">Shift+E</span> 最後にRでONした行を終了<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> 現在行の開始を0.1秒微調整<br><span class=\"kbd\">Ins</span> 下に行追加　<span class=\"kbd\">Shift+Ins</span> 上に行追加　<span class=\"kbd\">Del</span> 現在行削除　<span class=\"kbd\">Backspace</span> 時刻消去<br>途中保存では、未設定時刻も <span class=\"kbd\">--:--,---</span> として保存します。<br>右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。",
       "setting.monitorInterval": "字幕位置マーク更新周期",
       "button.apply": "適用",
       "label.outputFile": "SRT出力ファイル名",
@@ -1354,11 +1548,27 @@
       "button.startOn": "R: ON",
       "button.endOff": "E: OFF",
       "button.undo": "Z: Undo",
+      "button.offsetCal": "Calibrate",
+      "offsetCal.title": "Tap input offset calibration",
+      "offsetCal.close": "Close",
+      "offsetCal.description": "A low click plays every 0.5 seconds, and every fourth click is a higher target click. Press R on the high click. The recommended offset updates at tap counts 1/3/5/7/9, then uses the rolling median of the latest 9 valid taps.",
+      "offsetCal.currentTarget": "Current key",
+      "offsetCal.calcTarget": "Median window",
+      "offsetCal.beatTitle": "Press R on the high click",
+      "offsetCal.beatSub": "The low clicks provide rhythm. Use the sound, not the screen, as the timing reference.",
+      "offsetCal.validCount": "Valid taps",
+      "offsetCal.recommended": "Recommended offset",
+      "offsetCal.statusReady": "Start to play click sounds.",
+      "offsetCal.start": "Start",
+      "offsetCal.stop": "Stop",
+      "offsetCal.apply": "Apply",
+      "offsetCal.cancel": "Cancel",
       "setting.autoTrimPrev": "When R sets a start time, trim the previous row end if it overlaps the current start",
       "setting.eSelectedMode": "E edits the end time of the currently selected row and advances to the next row (for SRT re-editing). When OFF, E closes the last row started by R.",
       "setting.tapOffset": "Tap input offset",
+      "setting.wOffset": "W correction offset",
       "setting.waveformOffset": "Waveform display offset",
-      "help.shortcuts": "<span class=\"kbd\">Space</span> Play/Pause　<span class=\"kbd\">R</span> Set start & advance　<span class=\"kbd\">E</span> Set end (target depends on setting)<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> Move row　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> Seek audio by 2 seconds　<span class=\"kbd\">Z</span> Undo last operation<br><span class=\"kbd\">Shift+R</span> Retiming boundary　<span class=\"kbd\">Shift+E</span> End last row started by R<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> Nudge current start by 0.1s<br><span class=\"kbd\">Ins</span> Insert below　<span class=\"kbd\">Shift+Ins</span> Insert above　<span class=\"kbd\">Del</span> Delete current row　<span class=\"kbd\">Backspace</span> Clear time<br>Draft export saves missing times as <span class=\"kbd\">--:--,---</span>.<br>Double-click a subtitle row to seek the audio to that row's start time.",
+      "help.shortcuts": "<span class=\"kbd\">Space</span> Play/Pause　<span class=\"kbd\">R</span> Set start & advance　<span class=\"kbd\">W</span> Corrected R (adds W offset)　<span class=\"kbd\">E</span> Set end<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> Move row　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> Seek audio by 2 seconds　<span class=\"kbd\">Z</span> Undo last operation<br><span class=\"kbd\">Shift+R</span> Retiming boundary　<span class=\"kbd\">Shift+W</span> Corrected Shift+R　<span class=\"kbd\">Shift+E</span> End last row started by R<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> Nudge current start by 0.1s<br><span class=\"kbd\">Ins</span> Insert below　<span class=\"kbd\">Shift+Ins</span> Insert above　<span class=\"kbd\">Del</span> Delete current row　<span class=\"kbd\">Backspace</span> Clear time<br>Draft export saves missing times as <span class=\"kbd\">--:--,---</span>.<br>Double-click a subtitle row to seek the audio to that row's start time.",
       "setting.monitorInterval": "Subtitle position mark update interval",
       "button.apply": "Apply",
       "label.outputFile": "SRT output filename",
@@ -1775,6 +1985,14 @@
     return ms / 1000;
   }
 
+  function getWCorrectionOffsetSeconds() {
+    const input = $("wOffsetMs");
+    if (!input) return 0;
+    const ms = Number(input.value);
+    if (!Number.isFinite(ms)) return 0;
+    return ms / 1000;
+  }
+
   function getWaveformDisplayOffsetSeconds() {
     const input = $("waveformOffsetMs");
     if (!input) return 0;
@@ -1783,11 +2001,376 @@
     return ms / 1000;
   }
 
-  function getTapAdjustedTime() {
-    const raw = (audio.currentTime || 0) + getTapInputOffsetSeconds();
+  function getTapAdjustedTime(extraOffsetSeconds = 0) {
+    const raw = (audio.currentTime || 0) + getTapInputOffsetSeconds() + (Number(extraOffsetSeconds) || 0);
     const duration = audio && Number.isFinite(audio.duration) ? audio.duration : null;
     if (duration != null) return Math.max(0, Math.min(duration, raw));
     return Math.max(0, raw);
+  }
+
+
+  const offsetCal = {
+    open: false,
+    running: false,
+    taps: [],
+    suggestedMs: null,
+    medianWindowSize: 0,
+    recordedTargetIds: new Set(),
+    clickUrl: null
+  };
+  const OFFSET_CAL_BEAT_SECONDS = 0.5;
+  const OFFSET_CAL_TARGET_EVERY = 4;
+  const OFFSET_CAL_TARGET_INTERVAL_SECONDS = OFFSET_CAL_BEAT_SECONDS * OFFSET_CAL_TARGET_EVERY;
+  const OFFSET_CAL_FIRST_TARGET_SECONDS = OFFSET_CAL_TARGET_INTERVAL_SECONDS;
+  const OFFSET_CAL_TRACK_SECONDS = 60;
+  const OFFSET_CAL_VALID_WINDOW_MS = 800;
+  const OFFSET_CAL_MAX_WINDOW = 9;
+
+  function median(values) {
+    const nums = values
+      .map(v => Number(v))
+      .filter(v => Number.isFinite(v))
+      .sort((a, b) => a - b);
+    if (!nums.length) return null;
+    const mid = Math.floor(nums.length / 2);
+    if (nums.length % 2) return nums[mid];
+    return (nums[mid - 1] + nums[mid]) / 2;
+  }
+
+  function formatSignedMs(ms) {
+    if (!Number.isFinite(ms)) return "-- ms";
+    const rounded = Math.round(ms);
+    return `${rounded > 0 ? "+" : ""}${rounded} ms`;
+  }
+
+  function getOffsetCalMedianWindowSize(count) {
+    if (count >= 9) return 9;
+    if (count >= 7) return 7;
+    if (count >= 5) return 5;
+    if (count >= 3) return 3;
+    if (count >= 1) return 1;
+    return 0;
+  }
+
+  function updateOffsetCalSuggestion(force = false) {
+    const count = offsetCal.taps.length;
+    const nextWindow = getOffsetCalMedianWindowSize(count);
+    if (!nextWindow) {
+      offsetCal.suggestedMs = null;
+      offsetCal.medianWindowSize = 0;
+      return;
+    }
+
+    const shouldUpdate = force || count >= OFFSET_CAL_MAX_WINDOW || count % 2 === 1;
+    if (!shouldUpdate && offsetCal.suggestedMs != null) {
+      return;
+    }
+
+    const recent = offsetCal.taps.slice(-nextWindow);
+    const value = median(recent);
+    offsetCal.suggestedMs = value == null ? null : Math.round(value);
+    offsetCal.medianWindowSize = nextWindow;
+  }
+
+  function writeStringToDataView(view, offset, text) {
+    for (let i = 0; i < text.length; i += 1) {
+      view.setUint8(offset + i, text.charCodeAt(i));
+    }
+  }
+
+  function buildOffsetCalClickTrackUrl() {
+    if (offsetCal.clickUrl) return offsetCal.clickUrl;
+
+    const sampleRate = 44100;
+    const channels = 1;
+    const bitsPerSample = 16;
+    const bytesPerSample = bitsPerSample / 8;
+    const sampleCount = Math.ceil(OFFSET_CAL_TRACK_SECONDS * sampleRate);
+    const dataBytes = sampleCount * channels * bytesPerSample;
+    const buffer = new ArrayBuffer(44 + dataBytes);
+    const view = new DataView(buffer);
+
+    writeStringToDataView(view, 0, "RIFF");
+    view.setUint32(4, 36 + dataBytes, true);
+    writeStringToDataView(view, 8, "WAVE");
+    writeStringToDataView(view, 12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, channels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * channels * bytesPerSample, true);
+    view.setUint16(32, channels * bytesPerSample, true);
+    view.setUint16(34, bitsPerSample, true);
+    writeStringToDataView(view, 36, "data");
+    view.setUint32(40, dataBytes, true);
+
+    const samples = new Float32Array(sampleCount);
+    const clickLength = Math.floor(sampleRate * 0.055);
+    const totalBeats = Math.floor(OFFSET_CAL_TRACK_SECONDS / OFFSET_CAL_BEAT_SECONDS);
+
+    for (let beat = 1; beat <= totalBeats; beat += 1) {
+      const time = beat * OFFSET_CAL_BEAT_SECONDS;
+      const high = beat % OFFSET_CAL_TARGET_EVERY === 0;
+      const freq = high ? 1500 : 760;
+      const amp = high ? 0.85 : 0.38;
+      const start = Math.floor(time * sampleRate);
+
+      for (let j = 0; j < clickLength && start + j < sampleCount; j += 1) {
+        const t = j / sampleRate;
+        const envelope = Math.exp(-t * (high ? 72 : 92));
+        const sample = Math.sin(2 * Math.PI * freq * t) * amp * envelope;
+        samples[start + j] += sample;
+      }
+    }
+
+    let offset = 44;
+    for (let i = 0; i < sampleCount; i += 1) {
+      const s = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+      offset += 2;
+    }
+
+    const blob = new Blob([buffer], { type: "audio/wav" });
+    offsetCal.clickUrl = URL.createObjectURL(blob);
+    return offsetCal.clickUrl;
+  }
+
+  function getOffsetCalEls() {
+    return {
+      modal: $("offsetCalModal"),
+      audio: $("offsetCalAudio"),
+      target: $("offsetCalTarget"),
+      count: $("offsetCalCount"),
+      offset: $("offsetCalOffset"),
+      status: $("offsetCalStatus"),
+      start: $("offsetCalStartBtn"),
+      stop: $("offsetCalStopBtn"),
+      apply: $("offsetCalApplyBtn")
+    };
+  }
+
+  function getOffsetCalNextUpdateCount(count) {
+    if (count < 1) return 1;
+    if (count < 3) return 3;
+    if (count < 5) return 5;
+    if (count < 7) return 7;
+    if (count < 9) return 9;
+    return null;
+  }
+
+  function updateOffsetCalDisplay(statusText = null) {
+    const els = getOffsetCalEls();
+    if (!els.modal) return;
+
+    updateOffsetCalSuggestion();
+
+    const count = offsetCal.taps.length;
+    const nextUpdate = getOffsetCalNextUpdateCount(count);
+
+    if (els.target) {
+      if (!offsetCal.medianWindowSize) {
+        els.target.textContent = "-";
+      } else {
+        els.target.textContent = currentLang === "ja"
+          ? `直近${offsetCal.medianWindowSize}回`
+          : `Latest ${offsetCal.medianWindowSize}`;
+      }
+    }
+
+    if (els.count) {
+      els.count.textContent = String(count);
+    }
+
+    if (els.offset) {
+      const ref = count > 0 && count < OFFSET_CAL_MAX_WINDOW
+        ? (currentLang === "ja" ? " 参考" : " ref")
+        : "";
+      els.offset.textContent = offsetCal.suggestedMs == null ? "-- ms" : `${formatSignedMs(offsetCal.suggestedMs)}${ref}`;
+    }
+
+    if (els.status) {
+      if (statusText) {
+        els.status.textContent = statusText;
+      } else if (offsetCal.running) {
+        els.status.textContent = currentLang === "ja"
+          ? "高いクリック音に合わせて R を押してください。"
+          : "Press R on the high click.";
+      } else if (offsetCal.suggestedMs != null) {
+        els.status.textContent = currentLang === "ja"
+          ? "測定は停止しています。この値を適用する場合は「補正」を押してください。"
+          : "Measurement is stopped. Press Apply to use this value.";
+      } else {
+        els.status.textContent = tr("offsetCal.statusReady");
+      }
+
+      if (!statusText && nextUpdate && count > 0 && offsetCal.running) {
+        els.status.textContent += currentLang === "ja"
+          ? ` 次の中央値更新は${nextUpdate}回目です。`
+          : ` Next median update: tap ${nextUpdate}.`;
+      }
+    }
+
+    if (els.stop) els.stop.disabled = !offsetCal.running;
+    if (els.apply) els.apply.disabled = offsetCal.suggestedMs == null;
+  }
+
+  function startOffsetCalibration() {
+    if (!offsetCal.open) return;
+
+    const els = getOffsetCalEls();
+    if (!els.audio) return;
+
+    offsetCal.running = true;
+    offsetCal.taps = [];
+    offsetCal.suggestedMs = null;
+    offsetCal.medianWindowSize = 0;
+    offsetCal.recordedTargetIds = new Set();
+
+    els.audio.pause();
+    els.audio.src = buildOffsetCalClickTrackUrl();
+    els.audio.currentTime = 0;
+    els.audio.loop = false;
+
+    const playPromise = els.audio.play();
+    if (playPromise && playPromise.catch) {
+      playPromise.catch(() => {
+        offsetCal.running = false;
+        updateOffsetCalDisplay(currentLang === "ja"
+          ? "クリック音を開始できませんでした。もう一度「開始」を押してください。"
+          : "Could not start the click track. Press Start again."
+        );
+      });
+    }
+
+    updateOffsetCalDisplay();
+  }
+
+  function stopOffsetCalibration() {
+    const els = getOffsetCalEls();
+    if (els.audio) {
+      els.audio.pause();
+    }
+    offsetCal.running = false;
+    updateOffsetCalDisplay();
+  }
+
+  function openOffsetCalibration() {
+    const els = getOffsetCalEls();
+    if (!els.modal) return;
+    if (videoExportOpen) closeVideoExport();
+
+    offsetCal.open = true;
+    offsetCal.running = false;
+    offsetCal.taps = [];
+    offsetCal.suggestedMs = null;
+    offsetCal.medianWindowSize = 0;
+    offsetCal.recordedTargetIds = new Set();
+
+    els.modal.classList.add("is-open");
+    els.modal.setAttribute("aria-hidden", "false");
+    updateOffsetCalDisplay();
+    startOffsetCalibration();
+  }
+
+  function closeOffsetCalibration(applyValue = false) {
+    if (applyValue && offsetCal.suggestedMs != null && $("tapOffsetMs")) {
+      $("tapOffsetMs").value = String(offsetCal.suggestedMs);
+      log(currentLang === "ja"
+        ? `タップ入力オフセットを ${formatSignedMs(offsetCal.suggestedMs)} に設定しました。`
+        : `Tap input offset set to ${formatSignedMs(offsetCal.suggestedMs)}.`
+      );
+    }
+
+    stopOffsetCalibration();
+
+    const els = getOffsetCalEls();
+    if (els.modal) {
+      els.modal.classList.remove("is-open");
+      els.modal.setAttribute("aria-hidden", "true");
+    }
+
+    offsetCal.open = false;
+    focusApp();
+  }
+
+  function getNearestOffsetCalTarget(currentTime) {
+    const targetIndex = Math.max(1, Math.round(currentTime / OFFSET_CAL_TARGET_INTERVAL_SECONDS));
+    const candidates = [];
+
+    for (let idx = Math.max(1, targetIndex - 1); idx <= targetIndex + 1; idx += 1) {
+      if (offsetCal.recordedTargetIds.has(idx)) continue;
+      const targetTime = idx * OFFSET_CAL_TARGET_INTERVAL_SECONDS;
+      const deltaSeconds = currentTime - targetTime;
+      if (Math.abs(deltaSeconds * 1000) <= OFFSET_CAL_VALID_WINDOW_MS) {
+        candidates.push({ idx, targetTime, deltaSeconds });
+      }
+    }
+
+    if (!candidates.length) return null;
+    candidates.sort((a, b) => Math.abs(a.deltaSeconds) - Math.abs(b.deltaSeconds));
+    return candidates[0];
+  }
+
+  function handleOffsetCalKey(ev) {
+    if (!offsetCal.open) return false;
+
+    const key = (ev.key || "").toLowerCase();
+
+    if (key === "escape") {
+      ev.preventDefault();
+      ev.stopPropagation();
+      closeOffsetCalibration(false);
+      return true;
+    }
+
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    if (key !== "r") {
+      updateOffsetCalDisplay(currentLang === "ja"
+        ? "補正モードでは、高いクリック音に合わせて R だけを押してください。"
+        : "In calibration mode, press only R on the high click."
+      );
+      return true;
+    }
+
+    if (!offsetCal.running || ev.repeat) return true;
+
+    const els = getOffsetCalEls();
+    if (!els.audio || els.audio.paused) return true;
+
+    const currentTime = els.audio.currentTime || 0;
+    const matched = getNearestOffsetCalTarget(currentTime);
+
+    if (!matched) {
+      updateOffsetCalDisplay(currentLang === "ja"
+        ? "高いクリック音の有効範囲外のためノーカウントです。"
+        : "No count: outside the high-click timing window."
+      );
+      return true;
+    }
+
+    offsetCal.recordedTargetIds.add(matched.idx);
+
+    const deltaMs = matched.deltaSeconds * 1000;
+    const offsetMs = -deltaMs;
+    offsetCal.taps.push(offsetMs);
+    updateOffsetCalSuggestion(true);
+
+    const count = offsetCal.taps.length;
+    const nextUpdate = getOffsetCalNextUpdateCount(count);
+    let status = currentLang === "ja"
+      ? `記録: ズレ ${formatSignedMs(deltaMs)} → 補正値 ${formatSignedMs(offsetMs)}`
+      : `Recorded: lag ${formatSignedMs(deltaMs)} → offset ${formatSignedMs(offsetMs)}`;
+
+    if (count < OFFSET_CAL_MAX_WINDOW && nextUpdate) {
+      status += currentLang === "ja"
+        ? ` / 次の中央値更新は${nextUpdate}回目です。`
+        : ` / Next median update: tap ${nextUpdate}.`;
+    }
+
+    updateOffsetCalDisplay(status);
+    return true;
   }
 
   function applyAdvancedMode() {
@@ -2248,7 +2831,7 @@
     focusApp();
   }
 
-  function markStart(forcePrevEnd = false) {
+  function markStart(forcePrevEnd = false, extraOffsetSeconds = 0, useCorrection = false) {
     if (!lines.length) {
       log(currentLang === "ja" ? "先に歌詞行を反映してください。" : "Apply lyric lines first.");
       return;
@@ -2258,9 +2841,12 @@
       return;
     }
 
+    const t = getTapAdjustedTime(extraOffsetSeconds);
     pushUndo();
-    const t = getTapAdjustedTime();
     const i = currentIndex;
+    const keyLabel = useCorrection
+      ? (forcePrevEnd ? "Shift+W" : "W")
+      : (forcePrevEnd ? "Shift+R" : "R");
 
     // Shift+R は完成済みSRT再編集用の「境界修正」操作。
     // 通常Rの activeIndex 処理や「現在行終了時刻の自動クリア」は使わない。
@@ -2296,8 +2882,8 @@
       }
 
       log(currentLang === "ja"
-        ? `Shift+R: ${i + 1}行目の開始 ${formatSrtTime(t)} を設定しました。${extra.length ? " " + extra.join(" ") : ""}`
-        : `Shift+R: Set row ${i + 1} start to ${formatSrtTime(t)}.${extra.length ? " " + extra.join(" ") : ""}`
+        ? `${keyLabel}: ${i + 1}行目の開始 ${formatSrtTime(t)} を設定しました。${extra.length ? " " + extra.join(" ") : ""}`
+        : `${keyLabel}: Set row ${i + 1} start to ${formatSrtTime(t)}.${extra.length ? " " + extra.join(" ") : ""}`
       );
       focusApp();
       return;
@@ -2364,8 +2950,8 @@
     }
 
     log(currentLang === "ja"
-      ? `R: ${i + 1}行目の開始 ${formatSrtTime(t)} を設定しました。${extra.length ? " " + extra.join(" ") : ""}`
-      : `R: Set row ${i + 1} start to ${formatSrtTime(t)}.${extra.length ? " " + extra.join(" ") : ""}`
+      ? `${keyLabel}: ${i + 1}行目の開始 ${formatSrtTime(t)} を設定しました。${extra.length ? " " + extra.join(" ") : ""}`
+      : `${keyLabel}: Set row ${i + 1} start to ${formatSrtTime(t)}.${extra.length ? " " + extra.join(" ") : ""}`
     );
     focusApp();
   }
@@ -2383,8 +2969,8 @@
       return;
     }
 
-    pushUndo();
     const t = getTapAdjustedTime();
+    pushUndo();
     lines[targetIndex].end = t;
     const ended = targetIndex;
 
@@ -3436,6 +4022,8 @@
   }
 
   function openVideoExport() {
+    if (offsetCal.open) closeOffsetCalibration(false);
+
     if (!audio.paused) audio.pause();
     if (!audioObjectUrl && !audio.src) {
       log(currentLang === "ja" ? "先に音源ファイルを読み込んでください。" : "Load an audio/media file first.");
@@ -3605,7 +4193,7 @@
     return {
       format: "SRT Tap Timer Project",
       schemaVersion: 1,
-      appVersion: "1.56",
+      appVersion: "1.61",
       savedAt: new Date().toISOString(),
       sourceFiles: {
         textSrt: currentLyricsFileName || "",
@@ -3634,6 +4222,7 @@
         autoTrimPrev: !!$("autoTrimPrevEnd")?.checked,
         endSelectedLineMode: !!$("endSelectedLineMode")?.checked,
         tapOffsetMs: Number($("tapOffsetMs")?.value) || 0,
+        wOffsetMs: Number($("wOffsetMs")?.value) || 0,
         waveformOffsetMs: Number($("waveformOffsetMs")?.value) || 0,
         monitorIntervalMs
       },
@@ -3796,6 +4385,7 @@
     if ($("autoTrimPrevEnd") && Object.prototype.hasOwnProperty.call(s, "autoTrimPrev")) $("autoTrimPrevEnd").checked = !!s.autoTrimPrev;
     if ($("endSelectedLineMode") && Object.prototype.hasOwnProperty.call(s, "endSelectedLineMode")) $("endSelectedLineMode").checked = !!s.endSelectedLineMode;
     if ($("tapOffsetMs") && Number.isFinite(Number(s.tapOffsetMs))) $("tapOffsetMs").value = String(Number(s.tapOffsetMs));
+    if ($("wOffsetMs") && Number.isFinite(Number(s.wOffsetMs))) $("wOffsetMs").value = String(Number(s.wOffsetMs));
     if ($("waveformOffsetMs") && Number.isFinite(Number(s.waveformOffsetMs))) $("waveformOffsetMs").value = String(Number(s.waveformOffsetMs));
 
     if ($("monitorIntervalMs") && Number.isFinite(Number(s.monitorIntervalMs))) {
@@ -4311,6 +4901,11 @@
   });
 
   document.addEventListener("keydown", (ev) => {
+    if (offsetCal.open) {
+      handleOffsetCalKey(ev);
+      return;
+    }
+
     if (isEditableTarget(ev)) return;
 
     if (videoExportOpen) {
@@ -4333,6 +4928,9 @@
     } else if (key === "r") {
       ev.preventDefault();
       markStart(ev.shiftKey);
+    } else if (key === "w") {
+      ev.preventDefault();
+      markStart(ev.shiftKey, getWCorrectionOffsetSeconds(), true);
     } else if (key === "e") {
       ev.preventDefault();
       markEnd(ev.shiftKey);
@@ -4382,6 +4980,22 @@
   audio.addEventListener("play", focusApp);
   audio.addEventListener("pause", focusApp);
   setupMonitorTimer();
+
+  $("openOffsetCalBtn")?.addEventListener("click", openOffsetCalibration);
+  $("offsetCalStartBtn")?.addEventListener("click", startOffsetCalibration);
+  $("offsetCalStopBtn")?.addEventListener("click", stopOffsetCalibration);
+  $("offsetCalApplyBtn")?.addEventListener("click", () => closeOffsetCalibration(true));
+  $("offsetCalCancelBtn")?.addEventListener("click", () => closeOffsetCalibration(false));
+  $("offsetCalCloseX")?.addEventListener("click", () => closeOffsetCalibration(false));
+  $("offsetCalAudio")?.addEventListener("ended", () => {
+    if (offsetCal.open) {
+      stopOffsetCalibration();
+      updateOffsetCalDisplay(currentLang === "ja"
+        ? "クリック音が終了しました。続ける場合は「開始」を押してください。"
+        : "The click track has ended. Press Start to continue."
+      );
+    }
+  });
 
   const savedLang = localStorage.getItem("srtTapTimerLang");
   const browserLang = (navigator.language || "").toLowerCase().startsWith("ja") ? "ja" : "en";

@@ -1,5 +1,58 @@
 # Changelog
 
+## v1.63.1
+
+- Reviewed the tap-input timestamp capture path for subtitle timing quality.
+- Changed `R` / `W` / `Shift+R` / `Shift+W` so the adjusted media time is captured before `pushUndo()`.
+- Changed `E` / `Shift+E` so the adjusted media time is captured before `pushUndo()`.
+- This avoids delaying `audio.currentTime` capture with undo snapshot serialization when many subtitle rows are present.
+- No user-facing shortcut behavior or subtitle editing semantics were changed.
+
+## v1.63
+
+- Redesigned tap input offset calibration.
+- Removed the visual E/R target timing model from calibration.
+- Calibration now uses a generated click track played by an HTMLAudioElement.
+- Low clicks play every 0.5 seconds, and every fourth click is a higher target click.
+- Users press only `R` on the high click.
+- Timing is measured against the click-track audio element's `currentTime`, making the calibration structure closer to normal subtitle timing work.
+- Valid high-click timing window is ±800ms.
+- Recommended offset updates at valid tap counts 1, 3, 5, 7, and 9. After 9 valid taps, it updates using the rolling median of the latest 9 valid taps.
+
+## v1.62.2
+
+- Fixed tap input offset calibration matching so key presses are compared against the scheduled E/R timeline, not only already-created visual targets.
+- Calibration now accepts both early and late input around the scheduled time of the same key.
+- Example: pressing 0.4 seconds before an E target produces approximately `+400ms`; pressing 0.3 seconds after it produces approximately `-300ms`.
+- This better matches the intended purpose: measuring display/audio/output offset rather than only human reaction lag.
+
+## v1.62.1
+
+- Fixed tap input offset calibration stopping or appearing not to update when the user's tap arrived just after the visual target had switched to the next key.
+- Calibration now matches E/R input against the nearest recent same-key click target within the valid timing window, instead of requiring the key to match only the currently highlighted target.
+- The E/R alternating design means the same key appears every 1 second, so this remains unambiguous while being much more tolerant of display/audio/output latency.
+- Extended the late-side valid window for calibration matching to 700ms.
+
+## v1.62
+
+- Added tap input offset calibration mode.
+- The advanced tap input offset setting now has a `補正` / calibration button.
+- The calibration modal plays a click sound every 0.5 seconds and alternates highlighted `E` and `R` targets.
+- Users press the highlighted key at the click timing; the app records timing deviations and shows a recommended offset.
+- The recommended offset is calculated from the median of the latest 9 valid taps. Fewer valid taps are shown as a reference value until 9 are available.
+- The result is applied to `tapOffsetMs` only when the user presses the calibration apply button; canceling leaves the setting unchanged.
+- During calibration, `E` and `R` are captured by the modal and do not trigger subtitle editing shortcuts.
+
+## v1.61
+
+- Added `W` as corrected R.
+- `W` performs the same operation as `R`, but the input timestamp includes the configurable W correction offset.
+- Added `Shift + W` as corrected Shift+R.
+- `Shift + W` performs the same boundary retiming operation as `Shift + R`, but uses the W-corrected timestamp.
+- Added the advanced setting `W correction offset`, with a default value of `-200ms`.
+- Project save / restore now includes the W correction offset.
+- Updated the shortcut help and user guide to explain W / Shift+W and their relationship to the existing tap input offset.
+
 ## v1.60
 
 - Added `Shift + Left` and `Shift + Right` for fine start-time nudging.

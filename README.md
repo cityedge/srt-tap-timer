@@ -1,4 +1,4 @@
-# SRT Tap Timer v1.60
+# SRT Tap Timer v1.63.1
 
 SRT Tap Timer is a local browser-based tool for creating and editing SRT subtitle timing while listening to audio. It is designed especially for lyric subtitles, AI-generated SRT correction, simple subtitle video creation, and resumable project work.
 
@@ -48,3 +48,28 @@ Files are processed locally in the browser. The app itself does not upload audio
 MIT License.
 
 Copyright (c) 2026 cityedge
+
+
+## v1.62 note
+
+v1.62 adds a tap input offset calibration modal. It plays click sounds every 0.5 seconds and alternates E/R targets; the recommended offset is calculated from the median of the latest 9 valid taps.
+
+
+## v1.62.1 note
+
+v1.62.2 fixes calibration key matching so E/R taps can be associated with the nearest recent same-key click, rather than only the currently highlighted key.
+
+
+## v1.62.2 note
+
+Calibration now matches key presses against the scheduled E/R timeline with both early and late timing windows, so early taps before the visual switch can be counted correctly.
+
+
+## v1.63 note
+
+v1.63 redesigns tap input offset calibration: it uses a generated HTMLAudioElement click track with low clicks every 0.5 seconds and a high target click every 2 seconds. Users press only R on the high clicks. The recommendation updates at valid tap counts 1/3/5/7/9, then uses the rolling median of the latest 9 valid taps.
+
+
+## v1.63.1 note
+
+v1.63.1 improves timestamp capture quality for tap input. R/W/Shift+R/Shift+W and E/Shift+E now read the adjusted media time before pushing the undo snapshot, so large subtitle sets cannot delay the moment at which `audio.currentTime` is captured.
