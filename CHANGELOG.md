@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.64
+
+- Changed `Shift+E` behavior.
+- `Shift+E` now temporarily inverts the current E input mode.
+- If normal `E` ends the last row started by `R`, `Shift+E` ends the currently selected row.
+- If normal `E` ends the currently selected row, `Shift+E` ends the last row started by `R`.
+- Moved the SRT output filename and save controls upward in the left pane, directly below lyric input and above audio file selection.
+- Left-pane status/log placement remains unchanged.
+
 ## v1.63.1
 
 - Reviewed the tap-input timestamp capture path for subtitle timing quality.
