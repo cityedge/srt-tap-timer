@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.64.1
+
+- Improved right-pane lyric-cell editing.
+- Double-clicking a subtitle row now seeks to that row's start time even when the editable lyric cell is focused.
+- The right-pane lyric cell input handler no longer trims and rewrites `textContent` during editing.
+- This prevents the caret from jumping to the beginning when entering English phrases and typing a space after the first word.
+- Existing v1.64 Shift+E behavior and left-pane SRT output layout are retained.
+
 ## v1.64
 
 - Changed `Shift+E` behavior.

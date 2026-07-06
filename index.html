@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>SRT Tap Timer v1.64</title>
+<title>SRT Tap Timer v1.64.1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
@@ -980,7 +980,7 @@
 <body tabindex="-1">
 <header>
   <div class="headerMain">
-    <h1>SRT Tap Timer v1.64</h1>
+    <h1>SRT Tap Timer v1.64.1</h1>
     <div class="sub" data-i18n="app.subtitle">
       メタタグ付き歌詞テキストから歌詞行だけを抽出し、音源を聴きながらキーボードでSRTタイミングを打ち直すローカルツールです。
     </div>
@@ -1134,7 +1134,7 @@
       <span class="kbd">Shift+W</span> 補正Shift+R　
       <span class="kbd">Shift+E</span> E作用先を反転<br>
       <span class="kbd">Shift+←</span>/<span class="kbd">Shift+→</span> 現在行の開始を0.1秒微調整<br>
-      右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。
+      右側の字幕行をダブルクリックすると、歌詞セル編集中でもその字幕の開始時刻へ移動します。
     </div>
 <div id="log" class="log"></div>
   </section>
@@ -1416,7 +1416,7 @@
       "setting.tapOffset": "タップ入力オフセット",
       "setting.wOffset": "W補正オフセット",
       "setting.waveformOffset": "波形表示オフセット",
-      "help.shortcuts": "<span class=\"kbd\">Space</span> 再生/停止　<span class=\"kbd\">R</span> 開始ON・次行へ　<span class=\"kbd\">W</span> 補正R（Wオフセット加算）　<span class=\"kbd\">E</span> 終了OFF<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> 字幕行移動　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> 音源を2秒移動　<span class=\"kbd\">Z</span> 直前操作をアンドゥ<br><span class=\"kbd\">Shift+R</span> 前行終了＋現在行開始を同時修正　<span class=\"kbd\">Shift+W</span> 補正Shift+R　<span class=\"kbd\">Shift+E</span> E作用先を反転<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> 現在行の開始を0.1秒微調整<br><span class=\"kbd\">Ins</span> 下に行追加　<span class=\"kbd\">Shift+Ins</span> 上に行追加　<span class=\"kbd\">Del</span> 現在行削除　<span class=\"kbd\">Backspace</span> 時刻消去<br>途中保存では、未設定時刻も <span class=\"kbd\">--:--,---</span> として保存します。<br>右側の字幕行をダブルクリックすると、その字幕の開始時刻へ移動します。",
+      "help.shortcuts": "<span class=\"kbd\">Space</span> 再生/停止　<span class=\"kbd\">R</span> 開始ON・次行へ　<span class=\"kbd\">W</span> 補正R（Wオフセット加算）　<span class=\"kbd\">E</span> 終了OFF<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> 字幕行移動　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> 音源を2秒移動　<span class=\"kbd\">Z</span> 直前操作をアンドゥ<br><span class=\"kbd\">Shift+R</span> 前行終了＋現在行開始を同時修正　<span class=\"kbd\">Shift+W</span> 補正Shift+R　<span class=\"kbd\">Shift+E</span> E作用先を反転<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> 現在行の開始を0.1秒微調整<br><span class=\"kbd\">Ins</span> 下に行追加　<span class=\"kbd\">Shift+Ins</span> 上に行追加　<span class=\"kbd\">Del</span> 現在行削除　<span class=\"kbd\">Backspace</span> 時刻消去<br>途中保存では、未設定時刻も <span class=\"kbd\">--:--,---</span> として保存します。<br>右側の字幕行をダブルクリックすると、歌詞セル編集中でもその字幕の開始時刻へ移動します。",
       "setting.monitorInterval": "字幕位置マーク更新周期",
       "button.apply": "適用",
       "label.outputFile": "SRT出力ファイル名",
@@ -1565,7 +1565,7 @@
       "setting.tapOffset": "Tap input offset",
       "setting.wOffset": "W correction offset",
       "setting.waveformOffset": "Waveform display offset",
-      "help.shortcuts": "<span class=\"kbd\">Space</span> Play/Pause　<span class=\"kbd\">R</span> Set start & advance　<span class=\"kbd\">W</span> Corrected R (adds W offset)　<span class=\"kbd\">E</span> Set end<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> Move row　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> Seek audio by 2 seconds　<span class=\"kbd\">Z</span> Undo last operation<br><span class=\"kbd\">Shift+R</span> Retiming boundary　<span class=\"kbd\">Shift+W</span> Corrected Shift+R　<span class=\"kbd\">Shift+E</span> Invert E target<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> Nudge current start by 0.1s<br><span class=\"kbd\">Ins</span> Insert below　<span class=\"kbd\">Shift+Ins</span> Insert above　<span class=\"kbd\">Del</span> Delete current row　<span class=\"kbd\">Backspace</span> Clear time<br>Draft export saves missing times as <span class=\"kbd\">--:--,---</span>.<br>Double-click a subtitle row to seek the audio to that row's start time.",
+      "help.shortcuts": "<span class=\"kbd\">Space</span> Play/Pause　<span class=\"kbd\">R</span> Set start & advance　<span class=\"kbd\">W</span> Corrected R (adds W offset)　<span class=\"kbd\">E</span> Set end<br><span class=\"kbd\">↑</span>/<span class=\"kbd\">↓</span> Move row　<span class=\"kbd\">←</span>/<span class=\"kbd\">→</span> Seek audio by 2 seconds　<span class=\"kbd\">Z</span> Undo last operation<br><span class=\"kbd\">Shift+R</span> Retiming boundary　<span class=\"kbd\">Shift+W</span> Corrected Shift+R　<span class=\"kbd\">Shift+E</span> Invert E target<br><span class=\"kbd\">Shift+←</span>/<span class=\"kbd\">Shift+→</span> Nudge current start by 0.1s<br><span class=\"kbd\">Ins</span> Insert below　<span class=\"kbd\">Shift+Ins</span> Insert above　<span class=\"kbd\">Del</span> Delete current row　<span class=\"kbd\">Backspace</span> Clear time<br>Draft export saves missing times as <span class=\"kbd\">--:--,---</span>.<br>Double-click a subtitle row, including an editable lyric cell, to seek the audio to that row's start time.",
       "setting.monitorInterval": "Subtitle position mark update interval",
       "button.apply": "Apply",
       "label.outputFile": "SRT output filename",
@@ -4192,7 +4192,7 @@
     return {
       format: "SRT Tap Timer Project",
       schemaVersion: 1,
-      appVersion: "1.64",
+      appVersion: "1.64.1",
       savedAt: new Date().toISOString(),
       sourceFiles: {
         textSrt: currentLyricsFileName || "",
@@ -4600,10 +4600,10 @@
         updateRowHighlights();
       });
       tdText.addEventListener("input", () => {
-        line.text = encodeLineBreaksForCell(tdText.textContent).trim();
-        if (tdText.textContent !== line.text) {
-          tdText.textContent = line.text;
-        }
+        // contentEditable の入力中に trim() した文字列を書き戻すと、
+        // 英語フレーズで単語後にスペースを入れた瞬間にキャレット位置が壊れる。
+        // 入力中はユーザーのテキストをそのまま保持し、DOMへ書き戻さない。
+        line.text = encodeLineBreaksForCell(tdText.textContent);
         updateStatus();
       });
 
@@ -4614,7 +4614,11 @@
       });
 
       tr.addEventListener("dblclick", (ev) => {
-        if (ev.target.tagName === "INPUT" || ev.target.isContentEditable) return;
+        if (ev.target.tagName === "INPUT") return;
+        if (ev.target.isContentEditable) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        }
         seekToLineStart(i);
       });
 
