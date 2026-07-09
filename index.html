@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>SRT Tap Timer v1.64.1</title>
+<title>SRT Tap Timer v1.64.2</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
@@ -980,7 +980,7 @@
 <body tabindex="-1">
 <header>
   <div class="headerMain">
-    <h1>SRT Tap Timer v1.64.1</h1>
+    <h1>SRT Tap Timer v1.64.2</h1>
     <div class="sub" data-i18n="app.subtitle">
       メタタグ付き歌詞テキストから歌詞行だけを抽出し、音源を聴きながらキーボードでSRTタイミングを打ち直すローカルツールです。
     </div>
@@ -1769,6 +1769,18 @@
       return formatSrtTime(Math.floor(sec) + 1);
     }
     return `${pad2(h)}:${pad2(m)}:${pad2(s)},${pad3(ms)}`;
+  }
+
+  function toDisplayedTimeMs(sec) {
+    if (sec == null || !Number.isFinite(sec)) return null;
+    return Math.round(Math.max(0, sec) * 1000);
+  }
+
+  function isDisplayedAdjacentOverlap(leftEnd, rightStart) {
+    const leftMs = toDisplayedTimeMs(leftEnd);
+    const rightMs = toDisplayedTimeMs(rightStart);
+    if (leftMs == null || rightMs == null) return false;
+    return leftMs > rightMs;
   }
 
   function formatTimeForEditor(seconds) {
@@ -4192,7 +4204,7 @@
     return {
       format: "SRT Tap Timer Project",
       schemaVersion: 1,
-      appVersion: "1.64.1",
+      appVersion: "1.64.2",
       savedAt: new Date().toISOString(),
       sourceFiles: {
         textSrt: currentLyricsFileName || "",
@@ -4576,7 +4588,7 @@
       const tdStart = document.createElement("td");
       tdStart.className = "time";
       const prevLine = lines[i - 1];
-      if (prevLine && prevLine.end != null && line.start != null && prevLine.end > line.start) {
+      if (prevLine && isDisplayedAdjacentOverlap(prevLine.end, line.start)) {
         tdStart.classList.add("overlapTime");
       }
       tdStart.textContent = formatSrtTime(line.start);
@@ -4585,7 +4597,7 @@
       const tdEnd = document.createElement("td");
       tdEnd.className = "time";
       const nextLine = lines[i + 1];
-      if (nextLine && line.end != null && nextLine.start != null && line.end > nextLine.start) {
+      if (nextLine && isDisplayedAdjacentOverlap(line.end, nextLine.start)) {
         tdEnd.classList.add("overlapTime");
       }
       tdEnd.textContent = formatSrtTime(line.end);

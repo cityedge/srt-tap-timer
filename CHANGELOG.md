@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.64.2
+
+- Fixed false adjacent-row overlap highlighting in the right pane.
+- Adjacent overlap warnings now compare timestamps at displayed millisecond precision, matching SRT formatting.
+- If a previous row's end and the next row's start display as the same timestamp, they are no longer marked as overlap errors due only to tiny internal floating-point differences.
+- Existing v1.64.1 right-pane lyric-cell editing fixes are retained.
+
 ## v1.64.1
 
 - Improved right-pane lyric-cell editing.

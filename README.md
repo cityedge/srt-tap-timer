@@ -1,4 +1,4 @@
-# SRT Tap Timer v1.64.1
+# SRT Tap Timer v1.64.2
 
 SRT Tap Timer is a local browser-based tool for creating and editing SRT subtitle timing while listening to audio. It is designed especially for lyric subtitles, AI-generated SRT correction, simple subtitle video creation, and resumable project work.
 
@@ -83,3 +83,8 @@ v1.64 changes Shift+E to temporarily invert the current E input mode. If E is cu
 ## v1.64.1 note
 
 v1.64.1 improves right-pane lyric-cell editing. Double-clicking a row now seeks to that row's start time even when the editable lyric cell is focused. The right-pane lyric cell input handler also no longer trims and rewrites content during editing, preventing the caret from jumping to the beginning when typing English phrases with spaces.
+
+
+## v1.64.2 note
+
+v1.64.2 fixes adjacent-row overlap highlighting. The right-pane overlap warning now compares adjacent timestamps at the same displayed millisecond precision used by SRT formatting, preventing false red highlights when two adjacent timestamps display as equal but differ internally by a tiny floating-point amount.
