@@ -1,5 +1,59 @@
 # Changelog
 
+## v1.72
+
+- Suspend main-screen onset frames and the regular update timer while subtitle preview is open. Guard event-driven status/marker/waveform drawing as well, including seeks, pause/play, visibility changes and window resizing. Closing immediately synchronizes the main display and resumes the configured interval.
+- Add Shift+T to seek to the current row start through the existing double-click operation. Play/pause state is preserved; no Undo entry is added. Missing audio/start times, editing fields, IME, repeats, other modifiers and open dialogs are handled consistently.
+- Include T and Shift+T together in the left-pane shortcut help in Japanese and English. Localize the shared seek messages and update the README and user guide.
+
+## v1.71
+
+- Keep the preview canvas, audio controls and settings from overlapping in narrow windows; the dialog scrolls below its fixed header.
+- Removed video creation from the application: recording controls, MediaRecorder/stream capture, recording loops, download/progress state, recording-only messages/styles and the WebM-to-MP4 helper are deleted.
+- Renamed the main entry to Preview and the Japanese selected-time button to 「選択行の時刻消去」.
+- Preview shares the main audio element and clock. Opening preserves its position and playback state; closing pauses it and returns the same player and position to the main screen.
+- Fixed subtitles to white text with a black outline and no band; removed both controls and their saved settings. Images remain optional, with landscape/portrait, image fit, subtitle height and font size retained.
+- Render every overlapping completed cue. Based on an actual FFmpeg/libass comparison, earlier cues keep lower slots, later cues stack upward, multiline blocks stay together, surviving cues keep their positions and newcomers reuse freed space. Precomputed placement also works after seeking; font metrics/wrapping remain a Canvas approximation.
+- Preview reads media time independently of the main marker state. Frame callbacks detect changes without repainting an unchanged canvas, and opening/closing does not duplicate either display loop.
+- Save previewSettings in project JSON and migrate supported layout fields from older videoSettings. Removed outline/band flags are ignored. Project schema version 1 and subtitle timing data are retained.
+- Updated the README and user guide for preview-only operation, shared audio, overlap behavior and the reduced distribution.
+
+## v1.70
+
+- Separated playback-marker onset from regular display updates. During foreground playback, starts follow screen refresh via requestAnimationFrame; expiry and the other main-window displays use the configured regular interval (50ms by default).
+- Cached subtitle row/marker elements and update their text and green background only when the playback state changes, avoiding full-table DOM searches and repeated writes during monitoring.
+- Synchronize immediately after seeking, pausing, editing, Undo, media changes and returning to the tab. Stop the onset loop while paused, ended, hidden, seeking or without rows, and prevent duplicate loops.
+- Renamed the Japanese/English interval setting to Regular display update interval and added an automatic screen-synced onset label. The existing 100-row/100ms adjustment and saved interval now apply only to regular updates.
+- Removed periodic media timeupdate-triggered UI refreshes so they do not bypass the configured regular interval.
+- Handled cancelled play requests when playback is quickly started and paused, preventing an unhandled AbortError.
+- Retained the four-second blank-end marker rule, R/E/W/T behavior, timestamp capture order, project schema version 1, SRT export and video recording pipeline.
+- Updated the README and user guide for the two display update paths and compatibility with older projects.
+
+## v1.65.1
+
+- Removed the next-row start-time fallback from playback-marker end detection for rows without an end time.
+- Such rows now use the existing start-plus-four-seconds fallback regardless of later rows, retaining the audio-duration cap.
+- Multiple rows may show the playback marker and green background during overlapping display intervals.
+- Subtitle timestamps, SRT/project export, video eligibility, R/E capture order, and the rendering/update schedule are unchanged.
+- Documented the playback-marker rules in the user guide and README.
+
+## v1.65
+
+- Added Delete selected rows and Clear selected times buttons, available only when rows are checked. Each batch operation is undone with one Z press.
+- Batch deletion preserves the current and active timing rows when they survive, renumbers rows, and handles deleting every row.
+- Added T to copy the current row start to the previous row end. It preserves the current row, playback position, and other timestamps, works without audio, and applies no input offset.
+- T leaves data and undo history unchanged when the previous row is missing, the current start is unset, the resulting previous-row range is invalid, or the end already matches. Editing fields, IME composition, modifiers, and key repeats do not trigger it.
+- Added Japanese/English labels and help, and updated the user guide. Existing R/E/W, Delete, Backspace, and project schema behavior are retained.
+
+## v1.64.3
+
+- Fixed the on-screen R / E buttons incorrectly performing Shift+R / Shift+E operations because the click event was passed as the mode argument.
+- R / E button clicks now perform the same normal operations as the corresponding keys, including the current E-mode setting.
+- Existing keyboard shortcuts, timestamp capture before undo serialization, and project schema version 1 are unchanged.
+- Reconciled the user guide's Shift+E descriptions and retiming examples with the current mode-inversion behavior.
+- Updated calibration guidance to R-only input, clarified offsets and bulk-shift selection, and corrected outdated screen descriptions.
+- Updated the README to describe current behavior and link to the full guide and changelog.
+
 ## v1.64.2
 
 - Fixed false adjacent-row overlap highlighting in the right pane.

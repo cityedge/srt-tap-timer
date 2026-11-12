@@ -1,8 +1,32 @@
-# SRT Tap Timer v1.64.2
+# SRT Tap Timer v1.72
 
-SRT Tap Timer is a local browser-based tool for creating and editing SRT subtitle timing while listening to audio. It is designed especially for lyric subtitles, AI-generated SRT correction, simple subtitle video creation, and resumable project work.
+SRT Tap Timer is a local browser-based tool for creating and editing SRT subtitle timing while listening to audio. It supports lyric subtitles, AI-generated SRT correction, synchronized subtitle preview and resumable project work.
 
-SRT Tap Timer は、音源を聴きながら `R` / `E` キーで歌詞字幕の開始・終了タイミングを作成・修正できる、ローカル動作のブラウザ用SRT字幕エディターです。v1.57では、v1.56の作業保存・復元機能に加えて、Shift+Rで1つ前の字幕の終了時刻を現在行の開始時刻へ強制的に合わせる再編集ショートカットに対応しました。
+SRT Tap Timer は、音源を聴きながら `R` / `E` キーや画面ボタンで歌詞字幕の開始・終了タイミングを作成・修正できる、ローカル動作のブラウザ用SRT字幕エディターです。W補正、Shift系の境界修正・Eモード反転、作業保存・復元、音源と同期した字幕プレビューに対応しています。
+
+詳しい操作は [USER_GUIDE.md](USER_GUIDE.md)、バージョンごとの変更履歴は [CHANGELOG.md](CHANGELOG.md) を参照してください。
+
+## Current timing controls
+
+- The on-screen R / E buttons perform the same normal operations as the R / E keys.
+- E ends the last row started with R / W when E re-edit mode is off, or the selected row when the mode is on.
+- Shift+E temporarily inverts that target without changing the mode setting.
+- Shift+R sets the selected row start and previous row end to the same time, preserving the selected row end. Shift+W adds the W correction.
+- T copies the current row start to the previous row end without moving the current row or playback position. No audio file or tap offset is used.
+- Shift+T seeks to the current row start, using the same operation as double-clicking the row. It preserves play/pause state and does not add an Undo entry.
+- Calibration measures only R taps on the high click every 2 seconds. E is not a calibration input.
+
+チェックした行だけを対象とする **選択行を削除** / **選択行の時刻消去** ボタンと、前行の終了を現在行の開始に合わせる **Tキー** に対応しています。いずれもZの1回で元に戻せます。
+
+**Shift+T** は、現在行の開始時刻へ再生位置を移動します。ダブルクリックと同じ動作で、再生・停止状態を維持し、Undoの対象にはなりません。T / Shift+Tの説明は左ペインのキー一覧に表示しています。
+
+v1.65.1では、終了未設定の行の表示中マークを、後続行の開始に関係なく開始から4秒間（その間に音源が終わる場合は音源終了まで）表示するようにしました。字幕データの終了時刻は変更しません。
+
+For rows with a start but no end time, playback markers now use a four-second window, capped at the audio end when it falls within that window. Later rows do not shorten or extend it; saved timestamps are unchanged.
+
+v1.70では、`＊` と緑色背景の表示開始を画面の更新に同期させ、状態が変わった行だけを更新する方式に変更しました。**通常表示の更新周期(ms)**（旧「字幕位置マーク更新周期」）は、消灯・現在時刻・選択行・波形などに適用され、初期値は50msです。100行以上を読み込む際の100msへの自動調整は通常表示だけに適用され、表示開始には影響しません。シーク・停止・編集・Undoなどの直後は、その位置の表示へ即時に合わせます。
+
+In v1.70, playback-marker onset follows the screen refresh via `requestAnimationFrame`, with DOM updates only for rows whose marker state changes. **Regular display update interval (ms)** controls expiry, time/editor displays and waveform updates; its default is 50ms. The existing automatic adjustment to 100ms for 100 or more loaded rows affects only these regular updates. Seeking, pausing, editing and Undo synchronize the display immediately. Screen refresh and browser load affect actual onset latency; this is not a guaranteed 25ms deadline. The saved interval remains compatible with older project JSON files.
 
 ## Main features
 
@@ -13,9 +37,10 @@ SRT Tap Timer は、音源を聴きながら `R` / `E` キーで歌詞字幕の�
 - Save and restore SRT Tap Timer project JSON files.
 - Display a local waveform preview around the current audio position.
 - Directly edit the selected row's start, end, and subtitle text.
-- Preview and create a simple subtitle WebM video.
-- Export landscape video (16:9 / 1280×720) or short vertical video (9:16 / 720×1280).
-- Convert generated WebM files to MP4 with the included ffmpeg BAT.
+- Delete checked rows or clear only their timestamps as one undoable operation.
+- Preview subtitles using the same audio player and playback position as the main screen.
+- Show all overlapping completed cues in stacked blocks to expose timing conflicts.
+- Preview in landscape or portrait with an optional background image, adjustable image fit, subtitle height and font size.
 - Convert MP3 audio to WAV with the included ffmpeg BAT.
 
 ## Files
@@ -24,67 +49,34 @@ SRT Tap Timer は、音源を聴きながら `R` / `E` キーで歌詞字幕の�
 - `USER_GUIDE.md` — full user guide and detailed operation manual.
 - `CHANGELOG.md` — version history.
 - `LICENSE` — MIT License.
-- `convert_webm_to_mp4.bat` — drag-and-drop WebM to MP4 converter. Requires ffmpeg in PATH.
 - `convert_mp3_to_wav.bat` — drag-and-drop MP3 to WAV converter. Requires ffmpeg in PATH.
 
 ## Project save / restore
 
-Project JSON files save subtitle rows, text, current row, major editing settings, output names, and video export settings. They do not save the audio file, image file, generated WebM, waveform cache, or Undo history. After restoring a project, re-select the audio and image files if needed.
+Project JSON files save subtitle rows, text, current row, major editing settings, output names and preview settings. They do not save the audio file, image file, waveform cache or Undo history. After restoring a project, re-select the audio and image files if needed. Older projects retain their supported layout settings; removed outline/band options are ignored.
 
 ## Recommended environment
 
 Use the latest Google Chrome or Microsoft Edge on Windows.
 
-## Important video export note
+## Subtitle preview
 
-During WebM creation, keep the browser tab in the foreground. If you switch tabs while recording, the browser may throttle canvas rendering. The output WebM may still be created with audio, but subtitles may be missing.
+v1.71では動画作成機能を本体コードと配布物から削除し、**プレビュー** 専用にしました。メイン画面と同じ音源プレイヤーを使い、再生・停止・シークと字幕表示が同期します。閉じると停止し、その位置をメイン画面へ引き継ぎます。字幕は白文字・黒い縁取りあり・黒帯なしに固定しました。
+
+Preview uses white text with a black outline and no band. Every active completed cue is drawn. Overlaps follow an approximation of FFmpeg/libass Normal collision avoidance: earlier cues keep their lower slots, later cues stack upward, and new cues can reuse space freed by ended cues. Multiline cues stay together. Positions are precomputed so seeking matches continuous playback. Font metrics, line wrapping and ASS styling are not reproduced pixel for pixel. No recording or media-stream capture code remains in the app.
+
+The main-screen marker interval does not drive preview timing. Both displays read the same audio playback position, and the preview redraws its static canvas only when its visible cues or settings change.
+
+v1.72では、プレビュー表示中はメイン画面の開始マーク・通常更新タイマー・波形描画を停止します。プレビューを閉じると現在位置へ即時に合わせ、設定済みの通常更新周期で再開します。音源再生とプレビュー字幕は引き続き同期して動作します。
+
+While preview is open, main-screen marker frames, periodic updates and waveform drawing are suspended. Closing synchronizes the main display immediately and resumes its configured interval. Preview playback and subtitle timing continue independently.
 
 ## Privacy
 
-Files are processed locally in the browser. The app itself does not upload audio, lyrics, SRT, images, project JSON files, or generated videos to a server.
+Files are processed locally in the browser. The app itself does not upload audio, lyrics, SRT, images or project JSON files to a server.
 
 ## License
 
 MIT License.
 
 Copyright (c) 2026 cityedge
-
-
-## v1.62 note
-
-v1.62 adds a tap input offset calibration modal. It plays click sounds every 0.5 seconds and alternates E/R targets; the recommended offset is calculated from the median of the latest 9 valid taps.
-
-
-## v1.62.1 note
-
-v1.62.2 fixes calibration key matching so E/R taps can be associated with the nearest recent same-key click, rather than only the currently highlighted key.
-
-
-## v1.62.2 note
-
-Calibration now matches key presses against the scheduled E/R timeline with both early and late timing windows, so early taps before the visual switch can be counted correctly.
-
-
-## v1.63 note
-
-v1.63 redesigns tap input offset calibration: it uses a generated HTMLAudioElement click track with low clicks every 0.5 seconds and a high target click every 2 seconds. Users press only R on the high clicks. The recommendation updates at valid tap counts 1/3/5/7/9, then uses the rolling median of the latest 9 valid taps.
-
-
-## v1.63.1 note
-
-v1.63.1 improves timestamp capture quality for tap input. R/W/Shift+R/Shift+W and E/Shift+E now read the adjusted media time before pushing the undo snapshot, so large subtitle sets cannot delay the moment at which `audio.currentTime` is captured.
-
-
-## v1.64 note
-
-v1.64 changes Shift+E to temporarily invert the current E input mode. If E is currently set to end the last row started by R, Shift+E ends the current row. If E is currently set to end the current row, Shift+E ends the last row started by R. The SRT output controls were also moved upward in the left pane, directly below lyric input and above audio file selection.
-
-
-## v1.64.1 note
-
-v1.64.1 improves right-pane lyric-cell editing. Double-clicking a row now seeks to that row's start time even when the editable lyric cell is focused. The right-pane lyric cell input handler also no longer trims and rewrites content during editing, preventing the caret from jumping to the beginning when typing English phrases with spaces.
-
-
-## v1.64.2 note
-
-v1.64.2 fixes adjacent-row overlap highlighting. The right-pane overlap warning now compares adjacent timestamps at the same displayed millisecond precision used by SRT formatting, preventing false red highlights when two adjacent timestamps display as equal but differ internally by a tiny floating-point amount.
